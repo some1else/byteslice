@@ -1,0 +1,15 @@
+.Projector {
+	width: 100vw;
+	height: 100vh;
+	background-size: cover;
+}
+
+a {
+	color: white;
+	font-size: 2rem;
+	font-weight: bold;
+}
+
+.links {
+	display: none;
+}
