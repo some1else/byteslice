@@ -15,7 +15,8 @@ echo "My favourite exteions is $EXTENSION"
 
 for i in {1..100}
 do
-	NAME=$(echo "$OUTPUT_NAME-$i.jpg")
+	NAME=$(echo "$OUTPUT_NAME-$i.$EXTENSION")
 	echo "* Rendering slice $NAME"
 	./byteslice.sh $IMAGE_A $IMAGE_B $i $NAME $EXTENSION
+	convert $NAME $NAME.png
 done
