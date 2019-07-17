@@ -13,7 +13,7 @@ EXTENSION=$4
 
 echo "My favourite exteions is $EXTENSION"
 
-for i in {1..100}
+for i in {0..100}
 do
 	NAME=$(echo "$OUTPUT_NAME-$i.$EXTENSION")
 	echo "* Rendering slice $NAME"
