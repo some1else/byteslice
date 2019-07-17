@@ -1,15 +1,15 @@
-import React from 'react'
+import React from "react"
 
 const imgStyle = {
-	position: 'absolute',
-	opacity: 0,
+	position: "absolute",
+	opacity: 0
 }
 
 function getImagesFor(imageA, imageB) {
 	const desiredImages = []
 
 	for (let i = 1; i <= 100; i++) {
-		const image = `/images/${imageA}_${imageB}-${i}.jpg`
+		const image = `/mat-lab-3-renders/${imageA}${imageB}.MAT-${i}.MAT.png`
 		desiredImages.push(image)
 	}
 
@@ -19,20 +19,20 @@ function getImagesFor(imageA, imageB) {
 const ImagePreloader = () => {
 	let preloadedImages = []
 
-	const	metelkovaNjujork = getImagesFor('metelkova', 'njujork')
-	const	njujorkMetelkova = getImagesFor('njujork', 'metelkova')
-	const	metelkovaMontenegro = getImagesFor('metelkova', 'montenegro')
-	const	montenegroMetelkova = getImagesFor('montenegro', 'metelkova')
-	const	montenegroNjujork = getImagesFor('montenegro', 'njujork')
-	const	njujorkMontenegro = getImagesFor('njujork', 'montenegro')
+	const ab = getImagesFor("a", "b")
+	// const	ba = getImagesFor('b', 'a')
+	// const	ac = getImagesFor('a', 'c')
+	const ca = getImagesFor("a", "c")
+	// const	cb = getImagesFor('c', 'b')
+	const bc = getImagesFor("b", "c")
 
 	preloadedImages = preloadedImages.concat(
-		metelkovaNjujork,
-		njujorkMetelkova,
-		metelkovaMontenegro,
-		montenegroMetelkova,
-		montenegroNjujork,
-		njujorkMontenegro
+		ab,
+		// ba,
+		// ac,
+		ca,
+		// cb,
+		bc
 	)
 
 	return (
