@@ -5,8 +5,8 @@ import "./styles.css"
 const locations = ["a", "b", "c"]
 const locationPairs = ["ab", "ac", "bc"]
 
-const CROSSFADE_INTERVALS = [100, 401]
-const NEW_PAIR_INTERVALS = [4000, 4001]
+const CROSSFADE_INTERVALS = [64, 256]
+const NEW_PAIR_INTERVALS = [1024, 2048]
 
 const getLocationPair = (locA, locB) => {
 	const idxA = locations.indexOf(locA)
@@ -54,17 +54,16 @@ class Projector extends PureComponent {
 	}
 
 	componentDidMount() {
-		// this.startMixingCereography()
 		this.startApproachingTheDesiredMix()
 		const duration = this.pickNewTimeoutDuration(
 			CROSSFADE_INTERVALS[0],
 			CROSSFADE_INTERVALS[1]
 		)
 
-		setTimeout(this.handleEvent, duration)
+		setTimeout(this.handleEventLoop, duration)
 	}
 
-	handleEvent = () => {
+	handleEventLoop = () => {
 		const now = new Date()
 		const { lastMixed, lastChanged, desiredMix, actualMix } = this.state
 		const changeDuration = this.pickNewTimeoutDuration(
@@ -85,15 +84,19 @@ class Projector extends PureComponent {
 			const extremesOrBetweens =
 				timeHasPassed > changeDuration ? "extremes" : "betweens"
 
-			let desiredMix
+			let newDesiredMix
 			if (extremesOrBetweens === "extremes") {
-				desiredMix = this.flipPickAorB()
+				if (desiredMix === 0 || desiredMix === 100) {
+					newDesiredMix = desiredMix
+				} else {
+					newDesiredMix = this.flipPickAorB()
+				}
 			} else {
-				desiredMix = this.pickMix()
+				newDesiredMix = this.pickMix()
 			}
 
 			this.setState({
-				desiredMix,
+				desiredMix: newDesiredMix,
 				lastMixed: now
 			})
 		} else {
@@ -111,7 +114,7 @@ class Projector extends PureComponent {
 			CROSSFADE_INTERVALS[1]
 		)
 
-		setTimeout(this.handleEvent, duration)
+		setTimeout(this.handleEventLoop, duration)
 	}
 
 	flipPickAorB() {
@@ -160,12 +163,6 @@ class Projector extends PureComponent {
 		}
 	}
 
-	startMixingCereography() {
-		// this.startPickingNewCombinationsOfDestinations()
-		// this.startPickingNewMixValues()
-		// this.start
-	}
-
 	startApproachingTheDesiredMix() {
 		setInterval(() => {
 			this.approachDesiredMix()
@@ -178,73 +175,10 @@ class Projector extends PureComponent {
 		return timeoutDuration + additionalDuration
 	}
 
-	pickNewMixValue = () => {
-		const desiredMix = this.pickMix()
-		this.setState({ desiredMix })
-
-		const timeoutDuration = this.pickNewTimeoutDuration(
-			CROSSFADE_INTERVALS[0],
-			CROSSFADE_INTERVALS[1]
-		)
-		setTimeout(this.pickNewMixValue, timeoutDuration)
-	}
-
-	startPickingNewMixValues() {
-		this.pickNewMixValue()
-	}
-
-	pickNewCombinationsOfDestinations = () => {
-		const imageA = locations[Math.floor(Math.random() * 3)]
-		let imageB = locations[Math.floor(Math.random() * 3)]
-		while (imageA === imageB) {
-			imageB = locations[Math.floor(Math.random() * 3)]
-		}
-
-		const { locationPair, isInverse } = getLocationPair(imageA, imageB)
-
-		this.setState({
-			imageA,
-			imageB,
-			locationPair,
-			isInverse
-		})
-
-		const timeoutDuration = this.pickNewTimeoutDuration(
-			NEW_PAIR_INTERVALS[0],
-			NEW_PAIR_INTERVALS[1]
-		)
-
-		setTimeout(this.pickNewCombinationsOfDestinations, timeoutDuration)
-	}
-
-	pickNewCombinationsOfDestinations2 = () => {
-		if (Math.random() > 0.5) {
-			this.setState({ desiredMix: this.flipPickAorB() })
-		} else {
-			this.setState(this.flopPickC())
-		}
-
-		const timeoutDuration = this.pickNewTimeoutDuration(
-			NEW_PAIR_INTERVALS[0],
-			NEW_PAIR_INTERVALS[1]
-		)
-
-		setTimeout(this.pickNewCombinationsOfDestinations2, timeoutDuration)
-	}
-
-	startPickingNewCombinationsOfDestinations() {
-		const timeoutDuration = this.pickNewTimeoutDuration(
-			NEW_PAIR_INTERVALS[0],
-			NEW_PAIR_INTERVALS[1]
-		)
-
-		setTimeout(this.pickNewCombinationsOfDestinations2, timeoutDuration)
-	}
-
 	render() {
 		const { imageA, imageB, locationPair, isInverse, actualMix } = this.state
 
-		const finalMix = isInverse ? 100 - actualMix : actualMix
+		const finalMix = isInverse ? actualMix : 100 - actualMix
 
 		const imageURL = `/mat-lab-3-renders/${locationPair}.MAT-${finalMix}.MAT.png`
 
