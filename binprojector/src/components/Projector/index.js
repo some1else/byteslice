@@ -37,16 +37,16 @@ class Projector extends PureComponent {
 		edge: edges[0],
 		useReverseLookup: false,
 		desiredMix: MIX_MIN + (MIX_MAX - MIX_MIN) / 2,
-		actualMix: MIX_MIN + (MIX_MAX - MIX_MIN) / 2,
+		mix: MIX_MIN + (MIX_MAX - MIX_MIN) / 2,
 		lastMixed: new Date(),
 		lastChanged: new Date()
 	}
 
 	approachDesiredMix() {
-		const { desiredMix, actualMix } = this.state
-		const difference = desiredMix - actualMix
-		const nextMix = actualMix + Math.round(difference * 0.63)
-		this.setState({ actualMix: nextMix })
+		const { desiredMix, mix } = this.state
+		const difference = desiredMix - mix
+		const nextMix = mix + Math.round(difference * 0.63)
+		this.setState({ mix: nextMix })
 	}
 
 	componentDidMount() {
@@ -64,7 +64,7 @@ class Projector extends PureComponent {
 	}
 
 	handleEventLoop = () => {
-		const { lastChanged, actualMix } = this.state
+		const { lastChanged, mix } = this.state
 
 		const now = new Date()
 		const timeHasPassed = now.getTime() - lastChanged.getTime()
@@ -77,7 +77,7 @@ class Projector extends PureComponent {
 		const mixOrPick =
 			timeHasPassed < changeDuration
 				? "mix"
-				: actualMix === MIX_MIN || actualMix === MIX_MAX
+				: mix === MIX_MIN || mix === MIX_MAX
 				? "pick"
 				: "mix"
 
@@ -121,10 +121,10 @@ class Projector extends PureComponent {
 	}
 
 	pickAorB() {
-		const { actualMix } = this.state
+		const { mix } = this.state
 
-		const diffA = actualMix - MIX_MIN
-		const diffB = actualMix - MIX_MAX
+		const diffA = mix - MIX_MIN
+		const diffB = mix - MIX_MAX
 
 		let desiredMix
 
@@ -173,13 +173,13 @@ class Projector extends PureComponent {
 	}
 
 	render() {
-		const { edge, useReverseLookup, actualMix } = this.state
+		const { edge, useReverseLookup, mix } = this.state
 
-		const mix = useReverseLookup ? actualMix : MIX_MAX - actualMix
+		const transformedMix = useReverseLookup ? mix : MIX_MAX - mix
 
 		return (
 			<div className="Projector">
-				<EdgeMix edgeId={edge && edge.id} mix={mix} />
+				<EdgeMix edgeId={edge && edge.id} mix={transformedMix} />
 			</div>
 		)
 	}
