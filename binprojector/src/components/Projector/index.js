@@ -2,6 +2,11 @@ import React, { PureComponent } from "react"
 
 import "./styles.css"
 
+const MIX_MIN = 0
+const MIX_MAX = 100
+
+const MIX_FPS = Math.floor(1000 / 60) // 60fps
+
 const edgeAB = { id: "ab", from: "a", to: "b" }
 const edgeAC = { id: "ac", from: "a", to: "c" }
 const edgeBC = { id: "bc", from: "b", to: "c" }
@@ -25,44 +30,16 @@ const edges = [edgeAB, edgeAC, edgeBC]
 const CROSSFADE_INTERVALS = [64, 256]
 const NEW_PAIR_INTERVALS = [1024, 2048]
 
-const getEdge = (vertA, vertB) => {
-	const idxA = vertices.indexOf(vertA)
-	const idxB = vertices.indexOf(vertB)
-
-	let isInverse, edgeId
-	if (idxA < idxB) {
-		isInverse = false
-		edgeId = `${vertA.id}${vertB.id}`
-	} else {
-		isInverse = true
-		edgeId = `${vertB.id}${vertA.id}`
-	}
-
-	const edge = edges.find(({ id }) => edgeId === id)
-
-	return {
-		isInverse,
-		edge
-	}
-}
-
-const getInitialState = () => ({
-	vertA: vertices[0],
-	vertB: vertices[1],
-	edge: edges[0],
-	isInverse: false,
-	desiredMix: 50,
-	actualMix: 50,
-	lastMixed: new Date(),
-	lastChanged: new Date()
-})
-
 class Projector extends PureComponent {
-	state = getInitialState()
-
-	pickMix() {
-		const newMix = Math.round(Math.random() * 100)
-		return newMix
+	state = {
+		vertA: vertices[0],
+		vertB: vertices[1],
+		edge: edges[0],
+		useReverseLookup: false,
+		desiredMix: MIX_MIN + (MIX_MAX - MIX_MIN) / 2,
+		actualMix: MIX_MIN + (MIX_MAX - MIX_MIN) / 2,
+		lastMixed: new Date(),
+		lastChanged: new Date()
 	}
 
 	approachDesiredMix() {
@@ -73,8 +50,12 @@ class Projector extends PureComponent {
 	}
 
 	componentDidMount() {
-		this.startApproachingTheDesiredMix()
-		const duration = this.pickNewTimeoutDuration(
+		// Start approaching desiredMix
+		setInterval(() => {
+			this.approachDesiredMix()
+		}, MIX_FPS)
+
+		const duration = randomBetween(
 			CROSSFADE_INTERVALS[0],
 			CROSSFADE_INTERVALS[1]
 		)
@@ -85,7 +66,7 @@ class Projector extends PureComponent {
 	handleEventLoop = () => {
 		const now = new Date()
 		const { lastChanged, desiredMix, actualMix } = this.state
-		const changeDuration = this.pickNewTimeoutDuration(
+		const changeDuration = randomBetween(
 			NEW_PAIR_INTERVALS[0],
 			NEW_PAIR_INTERVALS[1]
 		)
@@ -95,7 +76,7 @@ class Projector extends PureComponent {
 		const mixOrPick =
 			timeHasPassed < changeDuration
 				? "mix"
-				: actualMix - 1 <= 0 || actualMix + 1 >= 100
+				: actualMix === MIX_MIN || actualMix === MIX_MAX
 				? "pick"
 				: "mix"
 
@@ -106,7 +87,7 @@ class Projector extends PureComponent {
 
 			let newDesiredMix
 			if (extremesOrBetweens === "extremes") {
-				if (desiredMix === 0 || desiredMix === 100) {
+				if (desiredMix === MIX_MIN || desiredMix === MIX_MAX) {
 					newDesiredMix = desiredMix
 				} else {
 					newDesiredMix = this.pickAorB()
@@ -129,7 +110,7 @@ class Projector extends PureComponent {
 			})
 		}
 
-		const duration = this.pickNewTimeoutDuration(
+		const duration = randomBetween(
 			CROSSFADE_INTERVALS[0],
 			CROSSFADE_INTERVALS[1]
 		)
@@ -137,14 +118,19 @@ class Projector extends PureComponent {
 		setTimeout(this.handleEventLoop, duration)
 	}
 
+	pickMix() {
+		const newMix = Math.round(Math.random() * MIX_MAX)
+		return newMix
+	}
+
 	pickAorB() {
 		const rand = Math.random()
 
 		let desiredMix
 		if (rand > 0.5) {
-			desiredMix = 100
+			desiredMix = MIX_MAX
 		} else {
-			desiredMix = 0
+			desiredMix = MIX_MIN
 		}
 
 		return desiredMix
@@ -159,56 +145,100 @@ class Projector extends PureComponent {
 		}
 
 		let remainingImg, newState
-		if (desiredMix === 0) {
+		if (desiredMix === MIX_MIN) {
 			remainingImg = vertA
 			newState = {
 				vertB: incomingVertex
 			}
-		} else {
+		} else if (desiredMix === MIX_MAX) {
 			remainingImg = vertB
 			newState = {
 				vertA: incomingVertex
 			}
+		} else {
+			debugger
 		}
 
-		const { edge, isInverse } = getEdge(
-			desiredMix === 0 ? remainingImg : incomingVertex,
-			desiredMix === 100 ? remainingImg : incomingVertex
+		const { edge, useReverseLookup } = getEdge(
+			desiredMix === MIX_MIN ? remainingImg : incomingVertex,
+			desiredMix === MIX_MAX ? remainingImg : incomingVertex
 		)
 
 		return {
 			...newState,
 			edge,
-			isInverse
+			useReverseLookup
 		}
-	}
-
-	startApproachingTheDesiredMix() {
-		setInterval(() => {
-			this.approachDesiredMix()
-		}, 16)
-	}
-
-	pickNewTimeoutDuration(min = 0, max = 1) {
-		let timeoutDuration = min
-		const additionalDuration = Math.round(Math.random() * max)
-		return timeoutDuration + additionalDuration
 	}
 
 	render() {
-		const { edge, isInverse, actualMix } = this.state
+		const { edge, useReverseLookup, actualMix } = this.state
 
-		const finalMix = isInverse ? actualMix : 100 - actualMix
+		const mix = useReverseLookup ? actualMix : MIX_MAX - actualMix
 
-		const imageURL = `/mat-lab-3-renders/${edge.id}.MAT-${finalMix}.MAT.png`
-
-		const projectorStyle = {
-			backgroundImage: `url('${imageURL}')`,
-			backgroundSize: "cover"
-		}
-
-		return <div className="Projector" style={projectorStyle}></div>
+		return (
+			<div className="Projector">
+				<EdgeMix edgeId={edge && edge.id} mix={mix} />
+			</div>
+		)
 	}
+}
+
+const EdgeMix = ({ edgeId, mix }) => {
+	const mixURL = `/mat-lab-3-renders/${edgeId}.MAT-${mix}.MAT.png`
+
+	const edgeMixStyle = {
+		backgroundImage: `url('${mixURL}')`
+	}
+
+	return <div className="EdgeMix" style={edgeMixStyle} />
+}
+
+class GraphContainer extends PureComponent {
+	state = {
+		edges: edges,
+		vertices: vertices,
+		vertA: null,
+		vertB: null,
+		edge: null
+	}
+
+	render() {
+		const { edges, vertices } = this.state
+		const { children } = this.props
+		return children({ edges, vertices })
+	}
+}
+
+function getEdge(vertA, vertB) {
+	const idxA = vertices.indexOf(vertA)
+	const idxB = vertices.indexOf(vertB)
+
+	let useReverseLookup, edgeId
+	if (idxA < idxB) {
+		useReverseLookup = false
+		edgeId = `${vertA.id}${vertB.id}`
+	} else {
+		useReverseLookup = true
+		edgeId = `${vertB.id}${vertA.id}`
+	}
+
+	const edge = edges.find(({ id }) => edgeId === id)
+
+	if (typeof edge === "undefined") {
+		debugger
+	}
+
+	return {
+		useReverseLookup,
+		edge
+	}
+}
+
+function randomBetween(min, max) {
+	let timeoutDuration = min
+	const additionalDuration = Math.round(Math.random() * max)
+	return timeoutDuration + additionalDuration
 }
 
 export default Projector
