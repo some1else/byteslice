@@ -64,14 +64,15 @@ class Projector extends PureComponent {
 	}
 
 	handleEventLoop = () => {
+		const { lastChanged, actualMix } = this.state
+
 		const now = new Date()
-		const { lastChanged, desiredMix, actualMix } = this.state
+		const timeHasPassed = now.getTime() - lastChanged.getTime()
+
 		const changeDuration = randomBetween(
 			NEW_PAIR_INTERVALS[0],
 			NEW_PAIR_INTERVALS[1]
 		)
-
-		const timeHasPassed = now.getTime() - lastChanged.getTime()
 
 		const mixOrPick =
 			timeHasPassed < changeDuration
