@@ -2,35 +2,54 @@ import React, { PureComponent } from "react"
 
 import "./styles.css"
 
-const locations = ["a", "b", "c"]
-const locationPairs = ["ab", "ac", "bc"]
+const edgeAB = { id: "ab", from: "a", to: "b" }
+const edgeAC = { id: "ac", from: "a", to: "c" }
+const edgeBC = { id: "bc", from: "b", to: "c" }
+
+const vertA = {
+	id: "a",
+	edges: ["ab", "ac"]
+}
+const vertB = {
+	id: "b",
+	edges: ["ab", "bc"]
+}
+const vertC = {
+	id: "c",
+	edges: ["ac", "bc"]
+}
+
+const vertices = [vertA, vertB, vertC]
+const edges = [edgeAB, edgeAC, edgeBC]
 
 const CROSSFADE_INTERVALS = [64, 256]
 const NEW_PAIR_INTERVALS = [1024, 2048]
 
-const getLocationPair = (locA, locB) => {
-	const idxA = locations.indexOf(locA)
-	const idxB = locations.indexOf(locB)
+const getEdge = (vertA, vertB) => {
+	const idxA = vertices.indexOf(vertA)
+	const idxB = vertices.indexOf(vertB)
 
-	let isInverse, locationPair
+	let isInverse, edgeId
 	if (idxA < idxB) {
 		isInverse = false
-		locationPair = `${locA}${locB}`
+		edgeId = `${vertA.id}${vertB.id}`
 	} else {
 		isInverse = true
-		locationPair = `${locB}${locA}`
+		edgeId = `${vertB.id}${vertA.id}`
 	}
+
+	const edge = edges.find(({ id }) => edgeId === id)
 
 	return {
 		isInverse,
-		locationPair
+		edge
 	}
 }
 
 const getInitialState = () => ({
-	imageA: locations[0],
-	imageB: locations[1],
-	locationPair: locations[0] + locations[1],
+	vertA: vertices[0],
+	vertB: vertices[1],
+	edge: edges[0],
 	isInverse: false,
 	desiredMix: 50,
 	actualMix: 50,
@@ -65,14 +84,14 @@ class Projector extends PureComponent {
 
 	handleEventLoop = () => {
 		const now = new Date()
-		const { lastMixed, lastChanged, desiredMix, actualMix } = this.state
+		const { lastChanged, desiredMix, actualMix } = this.state
 		const changeDuration = this.pickNewTimeoutDuration(
 			NEW_PAIR_INTERVALS[0],
 			NEW_PAIR_INTERVALS[1]
 		)
 
 		const timeHasPassed = now.getTime() - lastChanged.getTime()
-		console.log(timeHasPassed)
+
 		const mixOrPick =
 			timeHasPassed < changeDuration
 				? "mix"
@@ -81,6 +100,7 @@ class Projector extends PureComponent {
 				: "mix"
 
 		if (mixOrPick === "mix") {
+			// mix strategy
 			const extremesOrBetweens =
 				timeHasPassed > changeDuration ? "extremes" : "betweens"
 
@@ -89,7 +109,7 @@ class Projector extends PureComponent {
 				if (desiredMix === 0 || desiredMix === 100) {
 					newDesiredMix = desiredMix
 				} else {
-					newDesiredMix = this.flipPickAorB()
+					newDesiredMix = this.pickAorB()
 				}
 			} else {
 				newDesiredMix = this.pickMix()
@@ -100,8 +120,8 @@ class Projector extends PureComponent {
 				lastMixed: now
 			})
 		} else {
-			// pick
-			const newState = this.flopPickC()
+			// pick strategy
+			const newState = this.pickNewImage()
 			this.setState({
 				...newState,
 				lastMixed: now,
@@ -117,7 +137,7 @@ class Projector extends PureComponent {
 		setTimeout(this.handleEventLoop, duration)
 	}
 
-	flipPickAorB() {
+	pickAorB() {
 		const rand = Math.random()
 
 		let desiredMix
@@ -130,35 +150,35 @@ class Projector extends PureComponent {
 		return desiredMix
 	}
 
-	flopPickC() {
-		const { imageA, imageB, desiredMix } = this.state
+	pickNewImage() {
+		const { vertA, vertB, desiredMix } = this.state
 
-		let incomingImg = locations[Math.floor(Math.random() * 3)]
-		while (incomingImg === imageA || incomingImg === imageB) {
-			incomingImg = locations[Math.floor(Math.random() * 3)]
+		let incomingVertex = vertices[Math.floor(Math.random() * 3)]
+		while (incomingVertex === vertA || incomingVertex === vertB) {
+			incomingVertex = vertices[Math.floor(Math.random() * 3)]
 		}
 
 		let remainingImg, newState
 		if (desiredMix === 0) {
-			remainingImg = imageA
+			remainingImg = vertA
 			newState = {
-				imageB: incomingImg
+				vertB: incomingVertex
 			}
 		} else {
-			remainingImg = imageB
+			remainingImg = vertB
 			newState = {
-				imageA: incomingImg
+				vertA: incomingVertex
 			}
 		}
 
-		const { locationPair, isInverse } = getLocationPair(
-			desiredMix === 0 ? remainingImg : incomingImg,
-			desiredMix === 0 ? incomingImg : remainingImg
+		const { edge, isInverse } = getEdge(
+			desiredMix === 0 ? remainingImg : incomingVertex,
+			desiredMix === 100 ? remainingImg : incomingVertex
 		)
 
 		return {
 			...newState,
-			locationPair,
+			edge,
 			isInverse
 		}
 	}
@@ -176,11 +196,11 @@ class Projector extends PureComponent {
 	}
 
 	render() {
-		const { imageA, imageB, locationPair, isInverse, actualMix } = this.state
+		const { edge, isInverse, actualMix } = this.state
 
 		const finalMix = isInverse ? actualMix : 100 - actualMix
 
-		const imageURL = `/mat-lab-3-renders/${locationPair}.MAT-${finalMix}.MAT.png`
+		const imageURL = `/mat-lab-3-renders/${edge.id}.MAT-${finalMix}.MAT.png`
 
 		const projectorStyle = {
 			backgroundImage: `url('${imageURL}')`,
