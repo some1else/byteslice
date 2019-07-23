@@ -28,7 +28,7 @@ const ImagePreloader = () => {
 	return (
 		<div>
 			{preloadedImages.map(img => (
-				<img key={img} src={img} style={imgStyle} />
+				<img key={img} src={img} style={imgStyle} alt="" />
 			))}
 		</div>
 	)
