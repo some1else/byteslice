@@ -87,11 +87,7 @@ class Projector extends PureComponent {
 
 			let newDesiredMix
 			if (extremesOrBetweens === "extremes") {
-				if (desiredMix === MIX_MIN || desiredMix === MIX_MAX) {
-					newDesiredMix = desiredMix
-				} else {
-					newDesiredMix = this.pickAorB()
-				}
+				newDesiredMix = this.pickAorB()
 			} else {
 				newDesiredMix = this.pickMix()
 			}
@@ -124,10 +120,14 @@ class Projector extends PureComponent {
 	}
 
 	pickAorB() {
-		const rand = Math.random()
+		const { actualMix } = this.state
+
+		const diffA = actualMix - MIX_MIN
+		const diffB = actualMix - MIX_MAX
 
 		let desiredMix
-		if (rand > 0.5) {
+
+		if (diffA > diffB) {
 			desiredMix = MIX_MAX
 		} else {
 			desiredMix = MIX_MIN
