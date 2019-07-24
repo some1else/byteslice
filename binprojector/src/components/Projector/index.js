@@ -110,7 +110,7 @@ class Projector extends PureComponent {
 		const { mix } = this.state
 
 		const diffA = mix - MIX_MIN
-		const diffB = mix - MIX_MAX
+		const diffB = MIX_MAX - mix
 
 		let newMix
 		// move to whichever is closer
