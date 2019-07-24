@@ -16,7 +16,6 @@ class Projector extends PureComponent {
 		vertB: this.props.vertices[1],
 		edge: this.props.edges[0],
 		useReverseLookup: false,
-		desiredMix: MIX_MIN + (MIX_MAX - MIX_MIN) / 2,
 		mix: MIX_MIN + (MIX_MAX - MIX_MIN) / 2,
 		lastMixed: new Date(),
 		lastChanged: new Date()
@@ -58,15 +57,15 @@ class Projector extends PureComponent {
 			const extremesOrBetweens =
 				timeHasPassed > changeDuration ? "extremes" : "betweens"
 
-			let newDesiredMix
+			let newMix
 			if (extremesOrBetweens === "extremes") {
-				newDesiredMix = this.pickAorB()
+				newMix = this.pickExtremeMix()
 			} else {
-				newDesiredMix = this.pickMix()
+				newMix = this.pickMix()
 			}
 
 			this.setState({
-				desiredMix: newDesiredMix,
+				mix: newMix,
 				lastMixed: now
 			})
 		} else {
@@ -107,21 +106,21 @@ class Projector extends PureComponent {
 		return newMix
 	}
 
-	pickAorB() {
+	pickExtremeMix() {
 		const { mix } = this.state
 
 		const diffA = mix - MIX_MIN
 		const diffB = mix - MIX_MAX
 
-		let desiredMix
-
+		let newMix
+		// move to whichever is closer
 		if (diffA > diffB) {
-			desiredMix = MIX_MAX
+			newMix = MIX_MAX
 		} else {
-			desiredMix = MIX_MIN
+			newMix = MIX_MIN
 		}
 
-		return desiredMix
+		return newMix
 	}
 
 	randomVertex() {
@@ -140,12 +139,13 @@ class Projector extends PureComponent {
 
 	render() {
 		const { edge, useReverseLookup, mix } = this.state
+		const { id: edgeId } = edge || {}
 
 		const transformedMix = useReverseLookup ? mix : MIX_MAX - mix
 
 		return (
 			<div className="Projector">
-				<EdgeMix edgeId={edge && edge.id} mix={transformedMix} />
+				<EdgeMix edgeId={edgeId} mix={transformedMix} />
 			</div>
 		)
 	}
