@@ -87,4 +87,4 @@ var simpleGraph2 = {
 //   return newGraph
 // }
 
-module.exports = simpleGraph2
+module.exports = complexGraph

@@ -189,10 +189,17 @@ class ProjectorContainer extends PureComponent {
 		isLoaded: false
 	}
 
-	async componentDidMount() {
+	async fetchGraph() {
 		const resp = await fetch("http://localhost:3001/update")
 		const graph = await resp.json()
 		this.setState({ ...graph, isLoaded: true })
+	}
+
+	async componentDidMount() {
+		await this.fetchGraph()
+		setInterval(() => {
+			this.fetchGraph()
+		}, 5000)
 	}
 
 	render() {
