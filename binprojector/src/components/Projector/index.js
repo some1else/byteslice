@@ -70,17 +70,26 @@ class Projector extends PureComponent {
 			})
 		} else {
 			// pick strategy
+			const remainingVertex = isMinMix ? vertA : isMaxMix ? vertB : null
+			const excludeVertex = isMinMix ? vertB : isMaxMix ? vertA : null
+
+			if (remainingVertex === null || excludeVertex === null) {
+				debugger
+			}
+
 			const incomingVertex = this.pickNewVertex({
-				excludeVertices: [vertA, vertB]
+				excludeVertices: [excludeVertex],
+				includeVertex: remainingVertex
 			})
 
 			const newVertA = isMinMix ? vertA : incomingVertex
 			const newVertB = isMaxMix ? vertB : incomingVertex
+
 			const { edge, useReverseLookup } = getEdge(
 				vertices,
 				edges,
-				newVertA,
-				newVertB
+				newVertA.id,
+				newVertB.id
 			)
 
 			this.setState({
@@ -125,12 +134,21 @@ class Projector extends PureComponent {
 
 	randomVertex() {
 		const { vertices } = this.props
-		return vertices[Math.floor(Math.random() * 3)]
+		return vertices[Math.floor(Math.random() * vertices.length)]
 	}
 
-	pickNewVertex({ excludeVertices }) {
+	pickNewVertex({ excludeVertices, includeVertex }) {
+		const { vertices, edges } = this.props
+
 		let incomingVertex = this.randomVertex()
-		while (excludeVertices.indexOf(incomingVertex) > -1) {
+		while (
+			// While the incoming vertex exists in the exclusion list
+			excludeVertices.find(vert => vert.id === incomingVertex.id) ||
+			// // or an edge doesn't exist to it from the current vertext
+			!getEdge(vertices, edges, includeVertex.id, incomingVertex.id)
+			// 	!getEdge(vertices, edges, vertB.id, incomingVertex.id))
+		) {
+			// keep picking new random vertex
 			incomingVertex = this.randomVertex()
 		}
 
@@ -151,9 +169,15 @@ class Projector extends PureComponent {
 	}
 }
 
-function getEdge(vertices, edges, vertA, vertB) {
+function getEdge(vertices, edges, vertAId, vertBId) {
+	const vertA = vertices.find(vert => vert.id === vertAId)
+	const vertB = vertices.find(vert => vert.id === vertBId)
 	const idxA = vertices.indexOf(vertA)
 	const idxB = vertices.indexOf(vertB)
+
+	if (typeof vertA === "undefined" || typeof vertB === "undefined") {
+		debugger
+	}
 
 	let useReverseLookup, edgeId
 	if (idxA < idxB) {
@@ -167,7 +191,7 @@ function getEdge(vertices, edges, vertA, vertB) {
 	const edge = edges.find(({ id }) => edgeId === id)
 
 	if (typeof edge === "undefined") {
-		debugger
+		return false
 	}
 
 	return {
