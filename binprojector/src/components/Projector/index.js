@@ -64,7 +64,7 @@ class Projector extends PureComponent {
 	}
 
 	handleEventLoop = () => {
-		const { lastChanged, mix } = this.state
+		const { lastChanged, vertA, vertB, mix } = this.state
 
 		const now = new Date()
 		const timeHasPassed = now.getTime() - lastChanged.getTime()
@@ -74,10 +74,13 @@ class Projector extends PureComponent {
 			NEW_PAIR_INTERVALS[1]
 		)
 
+		const isMinMix = mix === MIX_MIN
+		const isMaxMix = mix === MIX_MAX
+
 		const mixOrPick =
 			timeHasPassed < changeDuration
 				? "mix"
-				: mix === MIX_MIN || mix === MIX_MAX
+				: isMinMix || isMaxMix
 				? "pick"
 				: "mix"
 
@@ -99,9 +102,18 @@ class Projector extends PureComponent {
 			})
 		} else {
 			// pick strategy
-			const newState = this.pickNewImage()
+			const incomingVertex = this.pickNewVertex({
+				excludeVertices: [vertA, vertB]
+			})
+
+			const newVertA = isMinMix ? vertA : incomingVertex
+			const newVertB = isMaxMix ? vertB : incomingVertex
+			const edgeInfo = getEdge(newVertA, newVertB) // { edge, useReverseLookup }
+
 			this.setState({
-				...newState,
+				vertA: newVertA,
+				vertB: newVertB,
+				...edgeInfo,
 				lastMixed: now,
 				lastChanged: now
 			})
@@ -137,39 +149,17 @@ class Projector extends PureComponent {
 		return desiredMix
 	}
 
-	pickNewImage() {
-		const { vertA, vertB, desiredMix } = this.state
+	randomVertex() {
+		return vertices[Math.floor(Math.random() * 3)]
+	}
 
-		let incomingVertex = vertices[Math.floor(Math.random() * 3)]
-		while (incomingVertex === vertA || incomingVertex === vertB) {
-			incomingVertex = vertices[Math.floor(Math.random() * 3)]
+	pickNewVertex({ excludeVertices }) {
+		let incomingVertex = this.randomVertex()
+		while (excludeVertices.indexOf(incomingVertex) > -1) {
+			incomingVertex = this.randomVertex()
 		}
 
-		let remainingImg, newState
-		if (desiredMix === MIX_MIN) {
-			remainingImg = vertA
-			newState = {
-				vertB: incomingVertex
-			}
-		} else if (desiredMix === MIX_MAX) {
-			remainingImg = vertB
-			newState = {
-				vertA: incomingVertex
-			}
-		} else {
-			debugger
-		}
-
-		const { edge, useReverseLookup } = getEdge(
-			desiredMix === MIX_MIN ? remainingImg : incomingVertex,
-			desiredMix === MIX_MAX ? remainingImg : incomingVertex
-		)
-
-		return {
-			...newState,
-			edge,
-			useReverseLookup
-		}
+		return incomingVertex
 	}
 
 	render() {
