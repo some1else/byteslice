@@ -1,83 +1,83 @@
 var edgeAB = {
-  id: "AB",
-  from: "A",
-  to: "B"
+	id: "ab",
+	from: "a",
+	to: "b"
 }
 
 var edgeAC = {
-  id: "AC",
-  from: "A",
-  to: "C"
+	id: "ac",
+	from: "a",
+	to: "c"
 }
 
 var edgeAE = {
-  id: "AE",
-  from: "A",
-  to: "E"
+	id: "ae",
+	from: "a",
+	to: "e"
 }
 
 var edgeBC = {
-  id: "BC",
-  from: "B",
-  to: "C"
+	id: "bc",
+	from: "b",
+	to: "c"
 }
 
 var edgeCD = {
-  id: "CD",
-  from: "C",
-  to: "D"
+	id: "cd",
+	from: "c",
+	to: "d"
 }
 
 var edgeDE = {
-  id: "DE",
-  from: "D",
-  to: "E"
+	id: "de",
+	from: "d",
+	to: "e"
 }
 
 var vertA = {
-  id: "A",
-  edges: ["AB", "AE"]
+	id: "a",
+	edges: ["ab", "ae"]
 }
 
 var vertB = {
-  id: "B",
-  edges: ["AB", "BC"]
+	id: "b",
+	edges: ["ab", "bc"]
 }
 
 var vertC = {
-  id: "C",
-  edges: ["BC", "CD"]
+	id: "c",
+	edges: ["bc", "cd"]
 }
 
 var vertD = {
-  id: "D",
-  edges: ["CD", "DE"]
+	id: "d",
+	edges: ["cd", "de"]
 }
 
 var vertE = {
-  id: "E",
-  edges: ["DE", "AE"]
+	id: "e",
+	edges: ["de", "ae"]
 }
 
 // pentagon
 var complexGraph = {
-  edges: [edgeAB, edgeAE, edgeBC, edgeCD, edgeDE],
-  vertices: [vertA, vertB, vertC, vertD, vertE]
+	edges: [edgeAB, edgeAE, edgeBC, edgeCD, edgeDE],
+	vertices: [vertA, vertB, vertC, vertD, vertE]
 }
 
 // triangle
 var simpleGraph = {
-  edges: [edgeAB, edgeAC, edgeBC],
-  vertices: [vertA, vertB, vertC]
+	edges: [edgeAB, edgeAC, edgeBC],
+	vertices: [vertA, vertB, vertC]
 }
 // triangle2
 var simpleGraph2 = {
-  ...simpleGraph,
-  vertices: [
-    { ...vertA, edges: ["AB", "AC"] },
-    { ...vertB, edges: ["AB", "BC"] },
-    { ...vertC, edges: ["BC", "AC"] }
-  ]
+	...simpleGraph,
+	vertices: [
+		{ ...vertA, edges: ["ab", "ac"] },
+		{ ...vertB, edges: ["ab", "bc"] },
+		{ ...vertC, edges: ["bc", "ac"] }
+	]
 }
 
 // function serialize(graph) {

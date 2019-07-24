@@ -7,34 +7,14 @@ import "./styles.css"
 const MIX_MIN = 0
 const MIX_MAX = 100
 
-const edgeAB = { id: "ab", from: "a", to: "b" }
-const edgeAC = { id: "ac", from: "a", to: "c" }
-const edgeBC = { id: "bc", from: "b", to: "c" }
-
-const vertA = {
-	id: "a",
-	edges: ["ab", "ac"]
-}
-const vertB = {
-	id: "b",
-	edges: ["ab", "bc"]
-}
-const vertC = {
-	id: "c",
-	edges: ["ac", "bc"]
-}
-
-const vertices = [vertA, vertB, vertC]
-const edges = [edgeAB, edgeAC, edgeBC]
-
-const CROSSFADE_INTERVALS = [64, 256]
+const CROSSFADE_INTERVALS = [256, 512]
 const NEW_PAIR_INTERVALS = [1024, 2048]
 
 class Projector extends PureComponent {
 	state = {
-		vertA: vertices[0],
-		vertB: vertices[1],
-		edge: edges[0],
+		vertA: this.props.vertices[0],
+		vertB: this.props.vertices[1],
+		edge: this.props.edges[0],
 		useReverseLookup: false,
 		desiredMix: MIX_MIN + (MIX_MAX - MIX_MIN) / 2,
 		mix: MIX_MIN + (MIX_MAX - MIX_MIN) / 2,
@@ -52,6 +32,7 @@ class Projector extends PureComponent {
 	}
 
 	handleEventLoop = () => {
+		const { edges, vertices } = this.props
 		const { lastChanged, vertA, vertB, mix } = this.state
 
 		const now = new Date()
@@ -96,12 +77,18 @@ class Projector extends PureComponent {
 
 			const newVertA = isMinMix ? vertA : incomingVertex
 			const newVertB = isMaxMix ? vertB : incomingVertex
-			const edgeInfo = getEdge(newVertA, newVertB) // { edge, useReverseLookup }
+			const { edge, useReverseLookup } = getEdge(
+				vertices,
+				edges,
+				newVertA,
+				newVertB
+			)
 
 			this.setState({
 				vertA: newVertA,
 				vertB: newVertB,
-				...edgeInfo,
+				edge,
+				useReverseLookup,
 				lastMixed: now,
 				lastChanged: now
 			})
@@ -138,6 +125,7 @@ class Projector extends PureComponent {
 	}
 
 	randomVertex() {
+		const { vertices } = this.props
 		return vertices[Math.floor(Math.random() * 3)]
 	}
 
@@ -163,8 +151,7 @@ class Projector extends PureComponent {
 	}
 }
 
-
-function getEdge(vertA, vertB) {
+function getEdge(vertices, edges, vertA, vertB) {
 	const idxA = vertices.indexOf(vertA)
 	const idxB = vertices.indexOf(vertB)
 
@@ -195,4 +182,23 @@ function randomBetween(min, max) {
 	return timeoutDuration + additionalDuration
 }
 
-export default Projector
+class ProjectorContainer extends PureComponent {
+	state = {
+		edges: [],
+		vertices: [],
+		isLoaded: false
+	}
+
+	async componentDidMount() {
+		const resp = await fetch("http://localhost:3001/update")
+		const graph = await resp.json()
+		this.setState({ ...graph, isLoaded: true })
+	}
+
+	render() {
+		const { edges, vertices, isLoaded } = this.state
+		return isLoaded && <Projector edges={edges} vertices={vertices} />
+	}
+}
+
+export default ProjectorContainer
