@@ -1,11 +1,11 @@
 import React, { PureComponent } from "react"
 
+import EdgeMix from "./EdgeMix"
+
 import "./styles.css"
 
 const MIX_MIN = 0
 const MIX_MAX = 100
-
-const MIX_FPS = Math.floor(1000 / 60) // 60fps
 
 const edgeAB = { id: "ab", from: "a", to: "b" }
 const edgeAC = { id: "ac", from: "a", to: "c" }
@@ -42,19 +42,7 @@ class Projector extends PureComponent {
 		lastChanged: new Date()
 	}
 
-	approachDesiredMix() {
-		const { desiredMix, mix } = this.state
-		const difference = desiredMix - mix
-		const nextMix = mix + Math.round(difference * 0.63)
-		this.setState({ mix: nextMix })
-	}
-
 	componentDidMount() {
-		// Start approaching desiredMix
-		setInterval(() => {
-			this.approachDesiredMix()
-		}, MIX_FPS)
-
 		const duration = randomBetween(
 			CROSSFADE_INTERVALS[0],
 			CROSSFADE_INTERVALS[1]
@@ -175,31 +163,6 @@ class Projector extends PureComponent {
 	}
 }
 
-const EdgeMix = ({ edgeId, mix }) => {
-	const mixURL = `/mat-lab-3-renders/${edgeId}.MAT-${mix}.MAT.png`
-
-	const edgeMixStyle = {
-		backgroundImage: `url('${mixURL}')`
-	}
-
-	return <div className="EdgeMix" style={edgeMixStyle} />
-}
-
-class GraphContainer extends PureComponent {
-	state = {
-		edges: edges,
-		vertices: vertices,
-		vertA: null,
-		vertB: null,
-		edge: null
-	}
-
-	render() {
-		const { edges, vertices } = this.state
-		const { children } = this.props
-		return children({ edges, vertices })
-	}
-}
 
 function getEdge(vertA, vertB) {
 	const idxA = vertices.indexOf(vertA)
