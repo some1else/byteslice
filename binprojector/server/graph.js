@@ -87,4 +87,21 @@ var simpleGraph2 = {
 //   return newGraph
 // }
 
-module.exports = complexGraph
+function generateGraph() {
+	const vertices = ["a.jpg", "b.jpg", "c.jpg", "d.jpg"]
+	const edges = []
+	for (var i = 0; i < vertices.length; i++) {
+		for (var j = i + 1; j < vertices.length; j++) {
+			const edge = vertices[i] + "." + vertices[j]
+			edges.push(edge)
+		}
+	}
+	return {
+		vertices: vertices.map(v => ({ id: v })),
+		edges: edges.map(e => ({ id: e }))
+	}
+}
+
+const generatedGraph = generateGraph()
+
+module.exports = generatedGraph
