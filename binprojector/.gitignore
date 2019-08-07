@@ -21,3 +21,13 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.png
+
+public/fif*
+public/*renders*
+public/mat-lab-*
+public/nonter
+public/quadro
+
+import
+output
