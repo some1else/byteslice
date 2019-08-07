@@ -2,12 +2,14 @@ import React, { PureComponent } from "react"
 
 import EdgeMix from "./EdgeMix"
 
+import { STEPS } from "../../App"
+
 import "./styles.css"
 
 const MIX_MIN = 0
-const MIX_MAX = 100
+const MIX_MAX = 50
 
-const CROSSFADE_INTERVALS = [256, 512]
+const CROSSFADE_INTERVALS = [64, 192]
 const NEW_PAIR_INTERVALS = [1024, 2048]
 
 class Projector extends PureComponent {
@@ -132,24 +134,29 @@ class Projector extends PureComponent {
 		return newMix
 	}
 
-	randomVertex() {
+	randomVertex(excludeVertexIds = []) {
 		const { vertices } = this.props
-		return vertices[Math.floor(Math.random() * vertices.length)]
+		const verticesLength = vertices.length
+		const randomIndex = () => Math.floor(Math.random() * verticesLength)
+		let randomVertex = vertices[randomIndex()]
+		while (excludeVertexIds.indexOf(randomVertex.id) > -1) {
+			randomVertex = vertices[randomIndex()]
+		}
+		return randomVertex
 	}
 
 	pickNewVertex({ excludeVertices, includeVertex }) {
 		const { vertices, edges } = this.props
 
-		let incomingVertex = this.randomVertex()
-		while (
-			// While the incoming vertex exists in the exclusion list
-			excludeVertices.find(vert => vert.id === incomingVertex.id) ||
-			// // or an edge doesn't exist to it from the current vertext
-			!getEdge(vertices, edges, includeVertex.id, incomingVertex.id)
-			// 	!getEdge(vertices, edges, vertB.id, incomingVertex.id))
-		) {
+		const excludeVertexIds = excludeVertices
+			.map(vert => vert.id)
+			.concat(includeVertex.id)
+
+		let incomingVertex = this.randomVertex(excludeVertexIds)
+
+		while (!getEdge(vertices, edges, includeVertex.id, incomingVertex.id)) {
 			// keep picking new random vertex
-			incomingVertex = this.randomVertex()
+			incomingVertex = this.randomVertex(excludeVertexIds)
 		}
 
 		return incomingVertex
@@ -182,15 +189,16 @@ function getEdge(vertices, edges, vertAId, vertBId) {
 	let useReverseLookup, edgeId
 	if (idxA < idxB) {
 		useReverseLookup = false
-		edgeId = `${vertA.id}${vertB.id}`
+		edgeId = `${vertA.id}.${vertB.id}`
 	} else {
 		useReverseLookup = true
-		edgeId = `${vertB.id}${vertA.id}`
+		edgeId = `${vertB.id}.${vertA.id}`
 	}
 
 	const edge = edges.find(({ id }) => edgeId === id)
 
 	if (typeof edge === "undefined") {
+		debugger
 		return false
 	}
 
@@ -206,30 +214,4 @@ function randomBetween(min, max) {
 	return timeoutDuration + additionalDuration
 }
 
-class ProjectorContainer extends PureComponent {
-	state = {
-		edges: [],
-		vertices: [],
-		isLoaded: false
-	}
-
-	async fetchGraph() {
-		const resp = await fetch("http://localhost:3001/update")
-		const graph = await resp.json()
-		this.setState({ ...graph, isLoaded: true })
-	}
-
-	async componentDidMount() {
-		await this.fetchGraph()
-		setInterval(() => {
-			this.fetchGraph()
-		}, 5000)
-	}
-
-	render() {
-		const { edges, vertices, isLoaded } = this.state
-		return isLoaded && <Projector edges={edges} vertices={vertices} />
-	}
-}
-
-export default ProjectorContainer
+export default Projector
