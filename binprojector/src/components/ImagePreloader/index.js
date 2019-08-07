@@ -1,4 +1,8 @@
-import React from "react"
+import React, { Fragment } from "react"
+
+import { BASEPATH, EXT } from "../../App"
+
+// const BASEPATH_OLD = "/mat-lab-3-renders"
 
 const imgStyle = {
 	position: "absolute",
@@ -9,28 +13,26 @@ function getImagesFor(imageA, imageB) {
 	const desiredImages = []
 
 	for (let i = 0; i <= 100; i++) {
-		const image = `/mat-lab-3-renders/${imageA}${imageB}.MAT-${i}.MAT.png`
+		const image = `${BASEPATH}/${imageA}${imageB}.MAT-${i}.MAT.${EXT}`
 		desiredImages.push(image)
 	}
 
 	return desiredImages
 }
 
-const ImagePreloader = () => {
+const ImagePreloader = ({ edges = [] }) => {
 	let preloadedImages = []
 
-	const ab = getImagesFor("a", "b")
-	const ca = getImagesFor("a", "c")
-	const bc = getImagesFor("b", "c")
-
-	preloadedImages = preloadedImages.concat(ab, ca, bc)
+	edges.forEach(edge => {
+		preloadedImages = preloadedImages.concat(getImagesFor(edge.id, ""))
+	})
 
 	return (
-		<div>
+		<Fragment>
 			{preloadedImages.map(img => (
 				<img key={img} src={img} style={imgStyle} alt="" />
 			))}
-		</div>
+		</Fragment>
 	)
 }
 
