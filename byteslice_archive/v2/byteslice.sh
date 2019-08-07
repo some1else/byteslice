@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# https://stackoverflow.com/questions/4783657/cli-write-byte-at-address-hexedit-modify-binary-from-the-command-line
-function replaceByte() {
-    printf "$(printf '\\x%02X' $3)" | dd of="$1" bs=1 seek=$2 count=1 conv=notrunc &> /dev/null
-}
-
 # Receive images
 INPUT_A=$1
 INPUT_B=$2
