@@ -1,11 +1,15 @@
 import React, { PureComponent } from "react"
 
-const MIX_SPEED = 0.7 // 0.63
-const MIX_FPS = Math.floor(1000 / 60) // 60fps
+import { BASEPATH, EXT } from "../../App"
+
+const FPS = 60
+const MIX_SPEED = 0.63 // 0.63
+const MIX_FPS = Math.floor(1000 / FPS)
 
 class EdgeMix extends PureComponent {
 	state = {
-		actualMix: this.props.mix
+		actualMix: this.props.mix,
+		offset: 0
 	}
 
 	approachMix = () => {
@@ -13,7 +17,11 @@ class EdgeMix extends PureComponent {
 		const { actualMix } = this.state
 		const difference = mix - actualMix
 		const nextMix = actualMix + Math.round(difference * MIX_SPEED)
-		this.setState({ actualMix: nextMix })
+		// const newOffset = Math.sin(Date.now() / 1000) * 10
+		this.setState({
+			actualMix: nextMix
+			// offset: newOffset
+		})
 	}
 
 	componentDidMount() {
@@ -25,7 +33,16 @@ class EdgeMix extends PureComponent {
 	render() {
 		const { actualMix } = this.state
 		const { edgeId } = this.props
-		const mixURL = `/mat-lab-3-renders/${edgeId}.MAT-${actualMix}.MAT.png`
+
+		// const { actualMix, offset } = this.state
+		// let finalMix = Math.round(actualMix + offset)
+		// if (finalMix > 100) {
+		// 	finalMix = 100
+		// } else if (finalMix < 0) {
+		// 	finalMix = 0
+		// }
+
+		const mixURL = `${BASEPATH}/${edgeId}.MAT-${actualMix}.MAT.${EXT}`
 
 		const edgeMixStyle = {
 			backgroundImage: `url('${mixURL}')`
