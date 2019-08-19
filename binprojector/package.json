@@ -13,10 +13,10 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "server": "nodemon --exec babel-node server/index.js",
-    "scraper": "nodemon --exec babel-node server/scrapeWorker.js",
-    "importer": "nodemon --exec babel-node server/importWorker.js",
-    "slicer": "nodemon --exec babel-node server/sliceWorker.js",
+    "server": "babel-node server/index.js",
+    "scraper": "babel-node server/scrapeWorker.js",
+    "importer": "babel-node server/importWorker.js",
+    "slicer": "babel-node server/sliceWorker.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

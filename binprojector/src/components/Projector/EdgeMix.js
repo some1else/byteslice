@@ -45,8 +45,6 @@ class EdgeMix extends PureComponent {
 		const imageA = vertices.find(v => v.id === edge.source)
 		const imageB = vertices.find(v => v.id === edge.target)
 
-		debugger
-
 		const {
 			data: { file: imageAFile }
 		} = imageA
