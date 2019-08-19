@@ -88,7 +88,7 @@ var simpleGraph2 = {
 // }
 
 function generateGraph() {
-	const vertices = ["a.jpg", "b.jpg", "c.jpg", "d.jpg"]
+	const vertices = ["a.png", "b.png", "c.png", "d.png", "e.png", "f.png"]
 	const edges = []
 	for (var i = 0; i < vertices.length; i++) {
 		for (var j = i + 1; j < vertices.length; j++) {
