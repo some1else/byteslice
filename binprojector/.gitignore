@@ -39,3 +39,5 @@ files/scraped/*.*
 files/sliced/*.*
 
 scraper/scraped/
+
+dump.rdb
