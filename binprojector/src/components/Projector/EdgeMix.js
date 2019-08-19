@@ -32,7 +32,7 @@ class EdgeMix extends PureComponent {
 
 	render() {
 		const { actualMix } = this.state
-		const { edgeId } = this.props
+		const { edge, vertices } = this.props
 
 		// const { actualMix, offset } = this.state
 		// let finalMix = Math.round(actualMix + offset)
@@ -42,7 +42,19 @@ class EdgeMix extends PureComponent {
 		// 	finalMix = 0
 		// }
 
-		const mixURL = `${BASEPATH}/${edgeId}.MAT-${actualMix}.MAT.${EXT}`
+		const imageA = vertices.find(v => v.id === edge.source)
+		const imageB = vertices.find(v => v.id === edge.target)
+
+		debugger
+
+		const {
+			data: { file: imageAFile }
+		} = imageA
+		const {
+			data: { file: imageBFile }
+		} = imageB
+
+		const mixURL = `${BASEPATH}/${imageAFile}.${imageBFile}.MAT-${actualMix}.MAT.${EXT}`
 
 		const edgeMixStyle = {
 			backgroundImage: `url('${mixURL}')`
