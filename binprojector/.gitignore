@@ -31,3 +31,11 @@ public/quadro
 
 import
 output
+
+archived
+
+files/imported/*.*
+files/scraped/*.*
+files/sliced/*.*
+
+scraper/scraped/
