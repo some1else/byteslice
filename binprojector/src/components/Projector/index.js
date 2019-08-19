@@ -9,15 +9,14 @@ import "./styles.css"
 const MIX_MIN = 0
 const MIX_MAX = 50
 
-const CROSSFADE_INTERVALS = [64, 192]
-const NEW_PAIR_INTERVALS = [1024, 2048]
+const CROSSFADE_INTERVALS = [64 * 1, 1 * 192]
+const NEW_PAIR_INTERVALS = [1024 * 1, 1 * 2048]
 
 class Projector extends PureComponent {
 	state = {
-		vertA: this.props.vertices[0],
-		vertB: this.props.vertices[1],
-		edge: this.props.edges[0],
-		useReverseLookup: false,
+		vertA: this.props.vertices.find(({ id }) => parseInt(id) === 1),
+		vertB: this.props.vertices.find(({ id }) => parseInt(id) === 2),
+		edge: this.props.edges.find(({ id }) => parseInt(id) === 1),
 		mix: MIX_MIN + (MIX_MAX - MIX_MIN) / 2,
 		lastMixed: new Date(),
 		lastChanged: new Date()
@@ -76,7 +75,7 @@ class Projector extends PureComponent {
 			const excludeVertex = isMinMix ? vertB : isMaxMix ? vertA : null
 
 			if (remainingVertex === null || excludeVertex === null) {
-				debugger
+				throw new Error("Alo")
 			}
 
 			const incomingVertex = this.pickNewVertex({
@@ -87,18 +86,14 @@ class Projector extends PureComponent {
 			const newVertA = isMinMix ? vertA : incomingVertex
 			const newVertB = isMaxMix ? vertB : incomingVertex
 
-			const { edge, useReverseLookup } = getEdge(
-				vertices,
-				edges,
-				newVertA.id,
-				newVertB.id
-			)
+			const edge = getEdge2(vertices, edges, newVertA, newVertB)
+
+			const isConnected = connectsVertices(edge, newVertA, newVertB)
 
 			this.setState({
 				vertA: newVertA,
 				vertB: newVertB,
 				edge,
-				useReverseLookup,
 				lastMixed: now,
 				lastChanged: now
 			})
@@ -134,12 +129,15 @@ class Projector extends PureComponent {
 		return newMix
 	}
 
-	randomVertex(excludeVertexIds = []) {
+	randomVertex(excludeVertexIds = [], filterCond = v => true) {
 		const { vertices } = this.props
 		const verticesLength = vertices.length
 		const randomIndex = () => Math.floor(Math.random() * verticesLength)
 		let randomVertex = vertices[randomIndex()]
-		while (excludeVertexIds.indexOf(randomVertex.id) > -1) {
+		while (
+			excludeVertexIds.indexOf(randomVertex.id) > -1 ||
+			!filterCond(randomVertex)
+		) {
 			randomVertex = vertices[randomIndex()]
 		}
 		return randomVertex
@@ -152,60 +150,45 @@ class Projector extends PureComponent {
 			.map(vert => vert.id)
 			.concat(includeVertex.id)
 
-		let incomingVertex = this.randomVertex(excludeVertexIds)
+		const connectCondition = vertex => {
+			const connectingEdge = edges.find(edge =>
+				connectsVertices(edge, includeVertex, vertex)
+			)
+			return !!connectingEdge
+		}
 
-		while (!getEdge(vertices, edges, includeVertex.id, incomingVertex.id)) {
+		let incomingVertex = this.randomVertex(excludeVertexIds, connectCondition)
+
+		while (!getEdge2(vertices, edges, includeVertex, incomingVertex)) {
 			// keep picking new random vertex
-			incomingVertex = this.randomVertex(excludeVertexIds)
+			incomingVertex = this.randomVertex(excludeVertexIds, connectCondition)
 		}
 
 		return incomingVertex
 	}
 
 	render() {
-		const { edge, useReverseLookup, mix } = this.state
-		const { id: edgeId } = edge || {}
-
-		const transformedMix = useReverseLookup ? mix : MIX_MAX - mix
+		const { edge, mix } = this.state
+		const { edges, vertices } = this.props
 
 		return (
 			<div className="Projector">
-				<EdgeMix edgeId={edgeId} mix={transformedMix} />
+				<EdgeMix edge={edge} vertices={vertices} mix={mix} />
 			</div>
 		)
 	}
 }
 
-function getEdge(vertices, edges, vertAId, vertBId) {
-	const vertA = vertices.find(vert => vert.id === vertAId)
-	const vertB = vertices.find(vert => vert.id === vertBId)
-	const idxA = vertices.indexOf(vertA)
-	const idxB = vertices.indexOf(vertB)
+function connectsVertices(edge, vertA, vertB) {
+	return (edge.source === vertA.id && edge.target === vertB.id) ||
+		(edge.source === vertB.id && edge.target === vertA.id)
+		? true
+		: false
+}
 
-	if (typeof vertA === "undefined" || typeof vertB === "undefined") {
-		debugger
-	}
-
-	let useReverseLookup, edgeId
-	if (idxA < idxB) {
-		useReverseLookup = false
-		edgeId = `${vertA.id}.${vertB.id}`
-	} else {
-		useReverseLookup = true
-		edgeId = `${vertB.id}.${vertA.id}`
-	}
-
-	const edge = edges.find(({ id }) => edgeId === id)
-
-	if (typeof edge === "undefined") {
-		debugger
-		return false
-	}
-
-	return {
-		useReverseLookup,
-		edge
-	}
+function getEdge2(vertices, edges, vertA, vertB) {
+	const edge = edges.find(edge => connectsVertices(edge, vertA, vertB))
+	return edge
 }
 
 function randomBetween(min, max) {
