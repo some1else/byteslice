@@ -19,7 +19,7 @@ async function main() {
 	console.log("images", images)
 
 	await images.forEach(async function(img) {
-		const convertCmd = `convert import/${img} -resize ${RES} -colorspace srgb -type TrueColorAlpha import/${img}.MAT`
+		const convertCmd = `convert import/${img} -trim -resize ${RES} -colorspace srgb -type TrueColorAlpha import/${img}.MAT`
 		console.log(convertCmd)
 		const { stdout: convertStdOut, stderr: convertStdErr } = await exec(
 			convertCmd
