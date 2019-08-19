@@ -1,6 +1,6 @@
 import React, { Fragment } from "react"
 
-import { BASEPATH, EXT } from "../../App"
+import { BASEPATH, EXT, STEPS } from "../../App"
 
 // const BASEPATH_OLD = "/mat-lab-3-renders"
 
@@ -9,22 +9,25 @@ const imgStyle = {
 	opacity: 0
 }
 
-function getImagesFor(imageA, imageB) {
+function getImagesFor(edge, vertices) {
+	const imageA = vertices.find(v => v.id === edge.source).data.file
+	const imageB = vertices.find(v => v.id === edge.target).data.file
+
 	const desiredImages = []
 
-	for (let i = 0; i <= 100; i++) {
-		const image = `${BASEPATH}/${imageA}${imageB}.MAT-${i}.MAT.${EXT}`
+	for (let i = 0; i <= STEPS; i++) {
+		const image = `${BASEPATH}/${imageA}.${imageB}.MAT-${i}.MAT.${EXT}`
 		desiredImages.push(image)
 	}
 
 	return desiredImages
 }
 
-const ImagePreloader = ({ edges = [] }) => {
+const ImagePreloader = ({ edges = [], vertices = [] }) => {
 	let preloadedImages = []
 
 	edges.forEach(edge => {
-		preloadedImages = preloadedImages.concat(getImagesFor(edge.id, ""))
+		preloadedImages = preloadedImages.concat(getImagesFor(edge, vertices))
 	})
 
 	return (
