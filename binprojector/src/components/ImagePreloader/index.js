@@ -1,4 +1,4 @@
-import React, { Fragment } from "react"
+import React, { PureComponent, Fragment } from "react"
 
 import { BASEPATH, EXT, STEPS } from "../../App"
 
@@ -23,20 +23,63 @@ function getImagesFor(edge, vertices) {
 	return desiredImages
 }
 
-const ImagePreloader = ({ edges = [], vertices = [] }) => {
-	let preloadedImages = []
+class ImagePreloader extends PureComponent {
+	state = {
+		preloadedEdgesCount: 0
+	}
 
-	edges.forEach(edge => {
-		preloadedImages = preloadedImages.concat(getImagesFor(edge, vertices))
-	})
+	componentDidMount() {
+		const { onPreloaded, edges } = this.props
 
-	return (
-		<Fragment>
-			{preloadedImages.map(img => (
-				<img key={img} src={img} style={imgStyle} alt="" />
-			))}
-		</Fragment>
-	)
+		this.preloadInterval = setInterval(() => {
+			const { preloadedEdgesCount } = this.state
+			this.setState({ preloadedEdgesCount: preloadedEdgesCount + 1 })
+			if (preloadedEdgesCount + 1 >= edges.length) {
+				clearInterval(this.preloadInterval)
+				onPreloaded && onPreloaded()
+			}
+		}, 400)
+	}
+
+	// handleImageLoad = () => {
+	// 	setTimeout(() => {
+	// 		this.setState(({ preloadedEdgesCount }) => ({
+	// 			preloadedEdgesCount: preloadedEdgesCount + 1
+	// 		}))
+	// 	}, 1000)
+	// }
+
+	render() {
+		const { edges = [], vertices = [] } = this.props
+		const { preloadedEdgesCount } = this.state
+
+		let preloadedImages = []
+
+		edges.slice(0, preloadedEdgesCount + 1).forEach(edge => {
+			preloadedImages = preloadedImages.concat(getImagesFor(edge, vertices))
+		})
+
+		return (
+			<Fragment>
+				{preloadedEdgesCount + 1 <= edges.length && (
+					<span>
+						{preloadedEdgesCount} / {edges.length}
+						<br />
+						{Math.ceil((preloadedEdgesCount / edges.length) * 100)} %
+					</span>
+				)}
+				{preloadedImages.map(img => (
+					<img
+						key={img}
+						src={img}
+						style={imgStyle}
+						alt=""
+						// onLoad={this.handleImageLoad}
+					/>
+				))}
+			</Fragment>
+		)
+	}
 }
 
 export default ImagePreloader

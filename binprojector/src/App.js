@@ -10,14 +10,28 @@ export const EXT = "jpg"
 export const STEPS = 50
 
 class App extends PureComponent {
+	state = {
+		hasPreloadedImages: false
+	}
+
+	onPreloaded = () => {
+		this.setState({ hasPreloadedImages: true })
+	}
 	render() {
+		const { hasPreloadedImages } = this.state
 		return (
 			<div className="App">
 				<GraphData>
 					{({ edges, vertices }) => (
 						<Fragment>
-							<Projector edges={edges} vertices={vertices} />
-							<ImagePreloader edges={edges} vertices={vertices} />
+							{hasPreloadedImages && (
+								<Projector edges={edges} vertices={vertices} />
+							)}
+							<ImagePreloader
+								edges={edges}
+								vertices={vertices}
+								onPreloaded={this.onPreloaded}
+							/>
 						</Fragment>
 					)}
 				</GraphData>

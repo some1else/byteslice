@@ -1,5 +1,6 @@
 import React, { PureComponent } from "react"
 
+import ImagePreloader from "../ImagePreloader"
 import EdgeMix from "./EdgeMix"
 
 import { STEPS } from "../../App"
@@ -173,7 +174,7 @@ class Projector extends PureComponent {
 
 		return (
 			<div className="Projector">
-				<EdgeMix edge={edge} vertices={vertices} mix={mix} />
+				<EdgeMix edge={edge} edges={edges} vertices={vertices} mix={mix} />
 			</div>
 		)
 	}
