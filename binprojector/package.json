@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "bee-queue": "^1.2.2",
+    "color": "^3.1.2",
     "express": "^4.17.1",
     "node-fetch": "^2.6.0",
     "prettier": "^1.18.2",
@@ -25,7 +26,11 @@
     "extends": "react-app"
   },
   "browserslist": {
-    "production": [">0.2%", "not dead", "not op_mini all"],
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
