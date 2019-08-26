@@ -13,8 +13,12 @@ const ids = {
   )
 }
 
+const MAX_ID = 808988
+
 function getNewId(scope) {
-  return (ids[scope] += 1)
+  const newId = ids[scope] + 1
+  ids[scope] = newId
+  return newId
 }
 
 function grow(graph, data = {}) {
@@ -139,6 +143,29 @@ function addNewVertex({ edges, vertices }, data = {}) {
     },
     newEdges: [newEdgeA, newEdgeB]
   }
+}
+
+function updateVertex({ edges, vertices }, oldVert, data = {}) {
+  const remainVertices = vertices.filter(v => v.id !== oldVert.id)
+  const vertEdges = oldVert.edges.map(id => findById(edges, id))
+  const remainEdges = edges.filter(e => oldVert.edges.indexOf(e.id) === -1)
+  const newEdges = vertEdges.map(edge => {
+    const { isCorrupted, isRendered, ...rest } = edge
+    return rest
+  })
+
+  const newVertex = {
+    id: oldVert.id,
+    edges: newEdges.map(e => e.id),
+    data
+  }
+
+  const graph = {
+    edges: [...remainEdges, ...newEdges],
+    vertices: [...remainVertices, newVertex]
+  }
+
+  return { graph, newEdges }
 }
 
 function sanitizeGraph(graph) {
@@ -274,12 +301,12 @@ function findById(collection, targetId) {
   return collection.find(({ id }) => id === targetId)
 }
 
-function updateEdge({ edges, vertices }, id, mut) {
+function updateEdge({ edges, vertices }, id, mutFunc) {
   const edge = edges.find(e => e.id === parseInt(id))
-  if (edge && mut) {
+  if (edge && mutFunc) {
     const remainEdges = edges.filter(e => e !== edge)
     return {
-      edges: [...remainEdges, mut(edge)],
+      edges: [...remainEdges, mutFunc(edge)],
       vertices
     }
   } else {
@@ -306,6 +333,22 @@ function removeEdges({ edges, vertices }, cond) {
   }
 }
 
+function findCorruptVertices({ edges, vertices }) {
+  const corruptVertices = vertices.filter(vert => {
+    const corruptEdges = vert.edges.filter(id => {
+      const edge = edges.find(e => e.id === id)
+      if (typeof edge === "undefined") {
+        return true
+      } else {
+        return edge.isCorrupted
+      }
+    })
+    return corruptEdges.length >= 2
+  })
+
+  return corruptVertices
+}
+
 function findLooseEdges({ edges, vertices }) {
   if (edges.length === 0) return 0
 
@@ -330,6 +373,7 @@ function findLooseEdges({ edges, vertices }) {
 }
 
 module.exports = {
+  MAX_ID,
   SEED_DATA,
   getNewId,
   grow,
@@ -338,10 +382,12 @@ module.exports = {
   createVertex,
   createEdge,
   addNewVertex,
+  updateVertex,
   sanitizeGraph,
   closeLastEdgeWithTarget,
   closeLastEdgeWithSource,
   findById,
+  findCorruptVertices,
   findLooseEdges,
   updateEdge,
   removeEdges

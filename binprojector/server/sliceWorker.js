@@ -34,9 +34,23 @@ async function sliceEdges(data) {
 	console.log(sliceCmd)
 
 	const { stdout, stderr } = await exec(sliceCmd)
-	console.log(stdout, stderr)
-	const { status } = await fetch(
-		`http://localhost:3001/g2/edges/${edge.id}/isRendered`
-	)
+	console.log(stdout)
+	console.error(stderr)
+	const bothOutputs = stdout + stderr
+	if (
+		bothOutputs.indexOf("improper image header") === -1 &&
+		bothOutputs.indexOf("no images defined") === -1 &&
+		bothOutputs.indexOf("unable to open image") === -1
+	) {
+		const { status } = await fetch(
+			`http://localhost:3001/g2/edges/${edge.id}/isRendered`
+		)
+		console.log("Marked slice as rendered")
+	} else {
+		const { status } = await fetch(
+			`http://localhost:3001/g2/edges/${edge.id}/isCorrupted`
+		)
+		console.error("Marked slice as corrupted")
+	}
 	return { stdout, stderr, status }
 }
