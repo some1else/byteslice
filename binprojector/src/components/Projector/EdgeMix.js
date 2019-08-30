@@ -76,15 +76,17 @@ class EdgeMix extends PureComponent {
 
 		return (
 			<div className="EdgeMix" style={edgeMixStyle}>
-				<div style={ctrStyle}>
-					{edges.length} edges
-					<br />
-					{vertices.length} vertices
-					<br />
-					Edge #{edge.id}
-					<br />
-					from: #{edge.source}, to: #{edge.target}
-				</div>
+				{false && (
+					<div style={ctrStyle}>
+						{edges.length} edges
+						<br />
+						{vertices.length} vertices
+						<br />
+						Edge #{edge.id}
+						<br />
+						from: #{edge.source}, to: #{edge.target}
+					</div>
+				)}
 			</div>
 		)
 	}
