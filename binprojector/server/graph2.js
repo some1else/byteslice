@@ -1,4 +1,5 @@
 const MAX_EDGES = 6
+const MAX_ID = 812819
 
 const SEED_DATA = require("./seedData.json")
 
@@ -12,8 +13,6 @@ const ids = {
     0
   )
 }
-
-const MAX_ID = 808988
 
 function getNewId(scope) {
   const newId = ids[scope] + 1
