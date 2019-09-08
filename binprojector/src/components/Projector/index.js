@@ -1,9 +1,6 @@
 import React, { PureComponent } from "react"
 
-import ImagePreloader from "../ImagePreloader"
 import EdgeMix from "./EdgeMix"
-
-import { STEPS } from "../../App"
 
 import "./styles.css"
 
@@ -89,7 +86,7 @@ class Projector extends PureComponent {
 
 			const edge = getEdge2(vertices, edges, newVertA, newVertB)
 
-			const isConnected = connectsVertices(edge, newVertA, newVertB)
+			// const isConnected = connectsVertices(edge, newVertA, newVertB)
 
 			this.setState({
 				vertA: newVertA,
@@ -172,11 +169,17 @@ class Projector extends PureComponent {
 
 	render() {
 		const { edge, mix } = this.state
-		const { edges, vertices } = this.props
+		const { edges, vertices, onMixChanged } = this.props
 
 		return (
 			<div className="Projector">
-				<EdgeMix edge={edge} edges={edges} vertices={vertices} mix={mix} />
+				<EdgeMix
+					edge={edge}
+					edges={edges}
+					vertices={vertices}
+					mix={mix}
+					onMixChanged={onMixChanged}
+				/>
 			</div>
 		)
 	}

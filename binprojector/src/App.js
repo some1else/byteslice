@@ -1,9 +1,11 @@
-import React, { Fragment, PureComponent } from "react"
-import "./App.css"
+import React, { PureComponent, Fragment } from "react"
+import WebMidi from "webmidi"
 
 import Projector from "./components/Projector"
 import ImagePreloader from "./components/ImagePreloader"
 import GraphData from "./components/Projector/GraphData"
+
+import "./App.css"
 
 export const BASEPATH = "/sliced"
 export const EXT = "jpg"
@@ -19,9 +21,24 @@ class App extends PureComponent {
 		this.setState({ edge })
 	}
 
-	onPreloaded = () => {
-		this.setState({ hasPreloadedImages: true })
+	onMixChanged = (mix) => {
+		this.setState({ mix })
+		this.midiOut &&
+			this.midiOut.sendControlChange(
+				"modulationwheelfine",
+				Math.floor((mix / STEPS) * 127),
+				1,
+			)
 	}
+
+	componentWillMount() {
+		WebMidi.enable((err) => {
+			if (!err) {
+				this.midiOut = WebMidi.getOutputByName("ByteSliceMix")
+			}
+		})
+	}
+
 	render() {
 		const { edge } = this.state
 		return (

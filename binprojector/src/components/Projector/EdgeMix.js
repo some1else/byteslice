@@ -3,7 +3,7 @@ import React, { PureComponent } from "react"
 import { BASEPATH, EXT } from "../../App"
 
 const FPS = 60
-const MIX_SPEED = 0.63 // 0.63
+const MIX_SPEED = 0.1 // 0.63
 const MIX_FPS = Math.floor(1000 / FPS)
 
 class EdgeMix extends PureComponent {
@@ -13,7 +13,7 @@ class EdgeMix extends PureComponent {
 	}
 
 	approachMix = () => {
-		const { mix } = this.props
+		const { mix, onMixChanged } = this.props
 		const { actualMix } = this.state
 		const difference = mix - actualMix
 		const nextMix = actualMix + Math.round(difference * MIX_SPEED)
@@ -22,6 +22,8 @@ class EdgeMix extends PureComponent {
 			actualMix: nextMix
 			// offset: newOffset
 		})
+
+		onMixChanged && onMixChanged(actualMix)
 	}
 
 	componentDidMount() {
@@ -64,10 +66,10 @@ class EdgeMix extends PureComponent {
 
 		const ctrStyle = {
 			position: "absolute",
-			top: "50%",
-			left: "50%",
-			transform: "translate(-50%, -50%)",
-			fontSize: "3rem",
+			bottom: "1rem",
+			right: "1rem",
+			// transform: "translate(-50%, -50%)",
+			fontSize: "1rem",
 			fontWeight: "bold",
 			mixBlendMode: "exclusion",
 			color: "black",
@@ -76,7 +78,7 @@ class EdgeMix extends PureComponent {
 
 		return (
 			<div className="EdgeMix" style={edgeMixStyle}>
-				{false && (
+				{true && (
 					<div style={ctrStyle}>
 						{edges.length} edges
 						<br />
