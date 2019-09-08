@@ -2,16 +2,14 @@ import React, { PureComponent, Fragment } from "react"
 
 import { BASEPATH, EXT, STEPS } from "../../App"
 
-// const BASEPATH_OLD = "/mat-lab-3-renders"
-
 const imgStyle = {
 	position: "absolute",
-	opacity: 0
+	opacity: 0,
 }
 
-function getImagesFor(edge, vertices) {
-	const imageA = vertices.find(v => v.id === edge.source).data.file
-	const imageB = vertices.find(v => v.id === edge.target).data.file
+function getEdgeImages(edge, vertices) {
+	const imageA = vertices.find((v) => v.id === edge.source).data.file
+	const imageB = vertices.find((v) => v.id === edge.target).data.file
 
 	const desiredImages = []
 
@@ -23,58 +21,52 @@ function getImagesFor(edge, vertices) {
 	return desiredImages
 }
 
+// TODO: Decide if preloading neighboring edges is required
+function getNeighboringEdges(edges, vertices, edge) {
+	const vertA = vertices.find(({ id }) => id === edge.source)
+	const vertB = vertices.find(({ id }) => id === edge.target)
+	return edges.filter(({ id }) => {
+		const isANeighbor = vertA.edges.indexOf(id) > -1
+		const isBNeighbor = vertB.edges.indexOf(id) > -1
+		return isANeighbor || isBNeighbor
+	})
+}
+
 class ImagePreloader extends PureComponent {
 	state = {
-		preloadedEdgesCount: 0
+		preloadedEdges: [],
+		preloadedImages: [],
 	}
 
-	componentDidMount() {
-		const { onPreloaded, edges } = this.props
+	componentDidUpdate(prevProps) {
+		const { edge, vertices = [] } = this.props
+		const { preloadedEdges, preloadedImages } = this.state
 
-		this.preloadInterval = setInterval(() => {
-			const { preloadedEdgesCount } = this.state
-			this.setState({ preloadedEdgesCount: preloadedEdgesCount + 1 })
-			if (preloadedEdgesCount + 1 >= edges.length) {
-				clearInterval(this.preloadInterval)
-				onPreloaded && onPreloaded()
-			}
-		}, 400)
+		if (preloadedEdges.indexOf(edge) > -1) return false
+
+		const { edge: prevEdge } = prevProps
+		if (prevEdge !== edge) {
+			this.setState({
+				preloadedImages: [
+					...preloadedImages,
+					...getEdgeImages(edge, vertices),
+				],
+				preloadedEdges: [...preloadedEdges, edge],
+			})
+		}
 	}
-
-	// handleImageLoad = () => {
-	// 	setTimeout(() => {
-	// 		this.setState(({ preloadedEdgesCount }) => ({
-	// 			preloadedEdgesCount: preloadedEdgesCount + 1
-	// 		}))
-	// 	}, 1000)
-	// }
 
 	render() {
-		const { edges = [], vertices = [] } = this.props
-		const { preloadedEdgesCount } = this.state
-
-		let preloadedImages = []
-
-		edges.slice(0, preloadedEdgesCount + 1).forEach(edge => {
-			preloadedImages = preloadedImages.concat(getImagesFor(edge, vertices))
-		})
+		const { preloadedImages } = this.state
 
 		return (
 			<Fragment>
-				{preloadedEdgesCount + 1 <= edges.length && (
-					<span>
-						{preloadedEdgesCount} / {edges.length}
-						<br />
-						{Math.ceil((preloadedEdgesCount / edges.length) * 100)} %
-					</span>
-				)}
-				{preloadedImages.map(img => (
+				{preloadedImages.map((img, i) => (
 					<img
-						key={img}
+						key={`preload-${img}-${i}`}
 						src={img}
 						style={imgStyle}
 						alt=""
-						// onLoad={this.handleImageLoad}
 					/>
 				))}
 			</Fragment>

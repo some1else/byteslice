@@ -33,7 +33,7 @@ class Projector extends PureComponent {
 	}
 
 	handleEventLoop = () => {
-		const { edges, vertices } = this.props
+		const { edges, vertices, onMixChanged, onEdgeChanged } = this.props
 		const { lastChanged, vertA, vertB, mix } = this.state
 
 		const now = new Date()
@@ -98,6 +98,8 @@ class Projector extends PureComponent {
 				lastMixed: now,
 				lastChanged: now
 			})
+
+			onEdgeChanged && onEdgeChanged({ edge })
 		}
 
 		const duration = randomBetween(

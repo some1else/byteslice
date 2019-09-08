@@ -11,27 +11,37 @@ export const STEPS = 50
 
 class App extends PureComponent {
 	state = {
-		hasPreloadedImages: false
+		edge: null,
+		mix: null,
+	}
+
+	onEdgeChanged = ({ edge }) => {
+		this.setState({ edge })
 	}
 
 	onPreloaded = () => {
 		this.setState({ hasPreloadedImages: true })
 	}
 	render() {
-		const { hasPreloadedImages } = this.state
+		const { edge } = this.state
 		return (
 			<div className="App">
 				<GraphData>
 					{({ edges, vertices }) => (
 						<Fragment>
-							{hasPreloadedImages && (
-								<Projector edges={edges} vertices={vertices} />
-							)}
-							<ImagePreloader
+							<Projector
 								edges={edges}
 								vertices={vertices}
-								onPreloaded={this.onPreloaded}
+								onEdgeChanged={this.onEdgeChanged}
+								onMixChanged={this.onMixChanged}
 							/>
+							{edge && (
+								<ImagePreloader
+									edges={edges}
+									vertices={vertices}
+									edge={edge}
+								/>
+							)}
 						</Fragment>
 					)}
 				</GraphData>
