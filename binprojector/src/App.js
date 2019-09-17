@@ -19,6 +19,16 @@ class App extends PureComponent {
 
 	onEdgeChanged = ({ edge }) => {
 		this.setState({ edge })
+		if (this.midiOut) {
+			const textureA = edge.source % 12
+			const textureB = edge.target % 12
+			this.midiOut
+				.playNote(textureA + 60, "all")
+				.stopNote(textureA + 60, "all", { time: 100 })
+			this.midiOut
+				.playNote(textureB + 72, "all")
+				.stopNote(textureB + 72, "all", { time: 100 })
+		}
 	}
 
 	onMixChanged = (mix) => {
@@ -35,6 +45,14 @@ class App extends PureComponent {
 		WebMidi.enable((err) => {
 			if (!err) {
 				this.midiOut = WebMidi.getOutputByName("ByteSliceMix")
+				if (this.midiOut) {
+					this.midiOut
+						.playNote(60, "all")
+						.stopNote(60, "all", { time: 100 })
+					this.midiOut
+						.playNote(72, "all")
+						.stopNote(72, "all", { time: 100 })
+				}
 			}
 		})
 	}
@@ -52,13 +70,12 @@ class App extends PureComponent {
 								onEdgeChanged={this.onEdgeChanged}
 								onMixChanged={this.onMixChanged}
 							/>
-							{edge && (
-								<ImagePreloader
-									edges={edges}
-									vertices={vertices}
-									edge={edge}
-								/>
-							)}
+
+							<ImagePreloader
+								edges={edges}
+								vertices={vertices}
+								edge={edge}
+							/>
 						</Fragment>
 					)}
 				</GraphData>
