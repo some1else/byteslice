@@ -17,28 +17,36 @@ class Projector extends PureComponent {
 		edge: this.props.edges.find(({ id }) => parseInt(id) === 1),
 		mix: MIX_MIN + (MIX_MAX - MIX_MIN) / 2,
 		lastMixed: new Date(),
-		lastChanged: new Date()
+		lastChanged: new Date(),
+		lastVisitedMap: {},
 	}
 
 	componentDidMount() {
 		const duration = randomBetween(
 			CROSSFADE_INTERVALS[0],
-			CROSSFADE_INTERVALS[1]
+			CROSSFADE_INTERVALS[1],
 		)
 
 		setTimeout(this.handleEventLoop, duration)
 	}
 
 	handleEventLoop = () => {
-		const { edges, vertices, onMixChanged, onEdgeChanged } = this.props
-		const { lastChanged, vertA, vertB, mix } = this.state
+		const { edges, vertices, onEdgeChanged } = this.props
+		const {
+			lastChanged,
+			vertA,
+			vertB,
+			mix,
+			edge: prevEdge,
+			lastVisitedMap,
+		} = this.state
 
 		const now = new Date()
 		const timeHasPassed = now.getTime() - lastChanged.getTime()
 
 		const changeDuration = randomBetween(
 			NEW_PAIR_INTERVALS[0],
-			NEW_PAIR_INTERVALS[1]
+			NEW_PAIR_INTERVALS[1],
 		)
 
 		const isMinMix = mix === MIX_MIN
@@ -65,7 +73,7 @@ class Projector extends PureComponent {
 
 			this.setState({
 				mix: newMix,
-				lastMixed: now
+				lastMixed: now,
 			})
 		} else {
 			// pick strategy
@@ -78,7 +86,7 @@ class Projector extends PureComponent {
 
 			const incomingVertex = this.pickNewVertex({
 				excludeVertices: [excludeVertex],
-				includeVertex: remainingVertex
+				includeVertex: remainingVertex,
 			})
 
 			const newVertA = isMinMix ? vertA : incomingVertex
@@ -88,12 +96,22 @@ class Projector extends PureComponent {
 
 			// const isConnected = connectsVertices(edge, newVertA, newVertB)
 
+			const ts = new Date()
+
+			const newLastVisitedMap = {
+				...lastVisitedMap,
+				[newVertA.id]: ts,
+				[newVertB.id]: ts,
+			}
+
 			this.setState({
 				vertA: newVertA,
 				vertB: newVertB,
 				edge,
+				prevEdge,
 				lastMixed: now,
-				lastChanged: now
+				lastChanged: now,
+				lastVisitedMap: newLastVisitedMap,
 			})
 
 			onEdgeChanged && onEdgeChanged({ edge })
@@ -101,7 +119,7 @@ class Projector extends PureComponent {
 
 		const duration = randomBetween(
 			CROSSFADE_INTERVALS[0],
-			CROSSFADE_INTERVALS[1]
+			CROSSFADE_INTERVALS[1],
 		)
 
 		setTimeout(this.handleEventLoop, duration)
@@ -129,7 +147,7 @@ class Projector extends PureComponent {
 		return newMix
 	}
 
-	randomVertex(excludeVertexIds = [], filterCond = v => true) {
+	randomVertex(excludeVertexIds = [], filterCond = (v) => true) {
 		const { vertices } = this.props
 		const verticesLength = vertices.length
 		const randomIndex = () => Math.floor(Math.random() * verticesLength)
@@ -145,16 +163,22 @@ class Projector extends PureComponent {
 
 	pickNewVertex({ excludeVertices, includeVertex }) {
 		const { vertices, edges } = this.props
+		const { lastVisitedMap } = this.state
 
 		const excludeVertexIds = excludeVertices
-			.map(vert => vert.id)
+			.map((vert) => vert.id)
 			.concat(includeVertex.id)
 
-		const connectCondition = vertex => {
-			const connectingEdge = edges.find(edge =>
-				connectsVertices(edge, includeVertex, vertex)
+		const connectCondition = (vertex) => {
+			const connectingEdge = edges.find((edge) =>
+				connectsVertices(edge, includeVertex, vertex),
 			)
-			return !!connectingEdge
+			// visitation
+			// const futureEdge = getEdge2(edges, vertices, includeVertex, vertex)
+			const lastVisited = lastVisitedMap[vertex.id]
+			const visitationFail = lastVisited && Math(Math.random() * 0.8)
+			new Date().valueOf() - lastVisited.valueOf() < 15 * 60 * 1000
+			return !!connectingEdge && !visitationFail
 		}
 
 		let incomingVertex = this.randomVertex(excludeVertexIds, connectCondition)
@@ -168,13 +192,14 @@ class Projector extends PureComponent {
 	}
 
 	render() {
-		const { edge, mix } = this.state
+		const { edge, prevEdge, mix } = this.state
 		const { edges, vertices, onMixChanged } = this.props
 
 		return (
 			<div className="Projector">
 				<EdgeMix
 					edge={edge}
+					prevEdge={prevEdge}
 					edges={edges}
 					vertices={vertices}
 					mix={mix}
@@ -193,7 +218,7 @@ function connectsVertices(edge, vertA, vertB) {
 }
 
 function getEdge2(vertices, edges, vertA, vertB) {
-	const edge = edges.find(edge => connectsVertices(edge, vertA, vertB))
+	const edge = edges.find((edge) => connectsVertices(edge, vertA, vertB))
 	return edge
 }
 
