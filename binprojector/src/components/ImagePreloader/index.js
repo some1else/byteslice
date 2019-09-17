@@ -21,7 +21,6 @@ function getEdgeImages(edge, vertices) {
 	return desiredImages
 }
 
-// TODO: Decide if preloading neighboring edges is required
 function getNeighboringEdges(edges, vertices, edge) {
 	const vertA = vertices.find(({ id }) => id === edge.source)
 	const vertB = vertices.find(({ id }) => id === edge.target)
@@ -38,20 +37,30 @@ class ImagePreloader extends PureComponent {
 		preloadedImages: [],
 	}
 
+	componentWillMount() {
+		const { edge, edges = [], vertices = [] } = this.props
+	}
+
 	componentDidUpdate(prevProps) {
-		const { edge, vertices = [] } = this.props
-		const { preloadedEdges, preloadedImages } = this.state
+		const { edge, edges = [], vertices = [] } = this.props
+		const { preloadedEdges } = this.state
 
 		if (preloadedEdges.indexOf(edge) > -1) return false
 
 		const { edge: prevEdge } = prevProps
 		if (prevEdge !== edge) {
+			// const newImages = getEdgeImages(edge, vertices)
+			const neighbors = getNeighboringEdges(edges, vertices, edge)
+			const newImages = neighbors
+				.map((e) => getEdgeImages(e, vertices))
+				.flat()
 			this.setState({
-				preloadedImages: [
-					...preloadedImages,
-					...getEdgeImages(edge, vertices),
+				preloadedImages: newImages,
+				preloadedEdges: [
+					...preloadedEdges,
+					...neighbors.filter((n) => preloadedEdges.indexOf(n) === -1),
+					preloadedEdges.indexOf(edge) === -1 && edge,
 				],
-				preloadedEdges: [...preloadedEdges, edge],
 			})
 		}
 	}
