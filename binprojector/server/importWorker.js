@@ -3,8 +3,9 @@ const util = require("util")
 const exec = util.promisify(require("child_process").exec)
 
 const Queue = require("bee-queue")
+const queueConf = require("./queue.config.js")
 
-const importQueue = new Queue("import")
+const importQueue = new Queue("import", queueConf)
 
 importQueue.on("ready", () => {
 	importQueue.process(async job => {

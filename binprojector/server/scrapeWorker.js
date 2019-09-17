@@ -5,9 +5,10 @@ const Color = require("color")
 const MAX_ID = require("./graph2.js").MAX_ID
 
 const Queue = require("bee-queue")
+const queueConf = require("./queue.config.js")
 
-const scrapeQueue = new Queue("scrape")
-const importQueue = new Queue("import")
+const scrapeQueue = new Queue("scrape", queueConf)
+const importQueue = new Queue("import", queueConf)
 
 const PIXEL_CMD = file => `convert ${file} \
 	-trim -resize 1x1 \

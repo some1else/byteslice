@@ -2,10 +2,11 @@ const NEW_CAMS_URL = "http://www.insecam.org/en/bynew/"
 
 const fs = require("fs")
 const puppeteer = require("puppeteer")
+const puppeteerConf = require("./puppeteer.config.js")
 const { disableImagesAndScripts } = require("./utils.js")
 
 ;(async () => {
-	const browser = await puppeteer.launch({ headless: false })
+	const browser = await puppeteer.launch(puppeteerConf)
 	const page = await browser.newPage()
 
 	await disableImagesAndScripts(page)

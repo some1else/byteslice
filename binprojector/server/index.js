@@ -1,10 +1,12 @@
-var fs = require("fs")
+const fs = require("fs")
 
 const express = require("express")
 const Queue = require("bee-queue")
 
-const scrapeQueue = new Queue("scrape")
-const sliceQueue = new Queue("slice")
+const queueConf = require("./queue.config.js")
+
+const scrapeQueue = new Queue("scrape", queueConf)
+const sliceQueue = new Queue("slice", queueConf)
 
 const g2 = require("./graph2.js")
 

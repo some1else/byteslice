@@ -3,8 +3,9 @@ const util = require("util")
 const exec = util.promisify(require("child_process").exec)
 
 const Queue = require("bee-queue")
+const queueConf = require("./queue.config.js")
 
-const sliceQueue = new Queue("slice")
+const sliceQueue = new Queue("slice", queueConf)
 
 sliceQueue.on("ready", () => {
 	sliceQueue.process(async job => {
