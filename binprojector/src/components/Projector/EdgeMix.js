@@ -1,15 +1,36 @@
 import React, { PureComponent } from "react"
 
-import { BASEPATH, EXT } from "../../App"
+import { BASEPATH, EXT, STEPS } from "../../App"
 
 const FPS = 60
 const MIX_SPEED = 0.1 // 0.63
 const MIX_FPS = Math.floor(1000 / FPS)
 
+function findCommonVertex(edgeA, edgeB) {
+	const { source: sourceA, target: targetA } = edgeA
+	const { source: sourceB, target: targetB } = edgeB
+
+	if (sourceA === sourceB) {
+		return sourceA
+	}
+
+	if (sourceA === targetB) {
+		return sourceA
+	}
+
+	if (targetA === targetB) {
+		return targetA
+	}
+
+	if (targetA === sourceB) {
+		return targetA
+	}
+}
+
 class EdgeMix extends PureComponent {
 	state = {
 		actualMix: this.props.mix,
-		offset: 0
+		offset: 0,
 	}
 
 	approachMix = () => {
@@ -19,7 +40,7 @@ class EdgeMix extends PureComponent {
 		const nextMix = actualMix + Math.round(difference * MIX_SPEED)
 		// const newOffset = Math.sin(Date.now() / 1000) * 10
 		this.setState({
-			actualMix: nextMix
+			actualMix: nextMix,
 			// offset: newOffset
 		})
 
@@ -34,7 +55,7 @@ class EdgeMix extends PureComponent {
 
 	render() {
 		const { actualMix } = this.state
-		const { edge, edges, vertices } = this.props
+		const { edge, prevEdge, edges, vertices } = this.props
 
 		// const { actualMix, offset } = this.state
 		// let finalMix = Math.round(actualMix + offset)
@@ -46,20 +67,31 @@ class EdgeMix extends PureComponent {
 
 		if (!edge) return <div />
 
-		const imageA = vertices.find(v => v.id === edge.source)
-		const imageB = vertices.find(v => v.id === edge.target)
+		let isInverted = false
+		if (prevEdge) {
+			const commonVert = findCommonVertex(edge, prevEdge)
+			if (edge.source === commonVert) {
+				isInverted = true
+			}
+		}
+
+		const imageA = vertices.find((v) => v.id === edge.source)
+		const imageB = vertices.find((v) => v.id === edge.target)
 
 		const edgeMixStyle = {}
+		let adjustedMix
 
 		if (imageA && imageB) {
 			const {
-				data: { file: imageAFile }
+				data: { file: imageAFile },
 			} = imageA
 			const {
-				data: { file: imageBFile }
+				data: { file: imageBFile },
 			} = imageB
 
-			const mixURL = `${BASEPATH}/${imageAFile}.${imageBFile}.MAT-${actualMix}.MAT.${EXT}`
+			adjustedMix = true ? STEPS - actualMix : actualMix
+
+			const mixURL = `${BASEPATH}/${imageAFile}.${imageBFile}.MAT-${adjustedMix}.MAT.${EXT}`
 
 			edgeMixStyle.backgroundImage = `url('${mixURL}')`
 		}
@@ -73,20 +105,23 @@ class EdgeMix extends PureComponent {
 			fontWeight: "bold",
 			mixBlendMode: "exclusion",
 			color: "black",
-			background: "white"
+			background: "white",
+			padding: "0.3rem",
 		}
 
 		return (
 			<div className="EdgeMix" style={edgeMixStyle}>
 				{true && (
 					<div style={ctrStyle}>
-						{edges.length} edges
-						<br />
-						{vertices.length} vertices
+						Mix {Math.round((adjustedMix / STEPS) * 100)}%
 						<br />
 						Edge #{edge.id}
 						<br />
-						from: #{edge.source}, to: #{edge.target}
+						Vert #{edge.source} - #{edge.target}
+						<br />
+						{edges.length} edges
+						<br />
+						{vertices.length} vertices
 					</div>
 				)}
 			</div>
