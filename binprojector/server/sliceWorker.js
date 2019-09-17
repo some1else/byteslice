@@ -7,6 +7,10 @@ const queueConf = require("./queue.config.js")
 
 const sliceQueue = new Queue("slice", queueConf)
 
+const fallbackServerHost =
+	process.env === "development" ? "localhost:3001" : "api:3001"
+const SERVER_HOST = process.env.SERVER_HOST || fallbackServerHost
+
 sliceQueue.on("ready", () => {
 	sliceQueue.process(async job => {
 		console.log("Processing", job.data)
@@ -44,12 +48,12 @@ async function sliceEdges(data) {
 		bothOutputs.indexOf("unable to open image") === -1
 	) {
 		const { status } = await fetch(
-			`http://localhost:3001/g2/edges/${edge.id}/isRendered`
+			`http://${SERVER_HOST}/g2/edges/${edge.id}/isRendered`
 		)
 		console.log("Marked slice as rendered")
 	} else {
 		const { status } = await fetch(
-			`http://localhost:3001/g2/edges/${edge.id}/isCorrupted`
+			`http://${SERVER_HOST}/g2/edges/${edge.id}/isCorrupted`
 		)
 		console.error("Marked slice as corrupted")
 	}
