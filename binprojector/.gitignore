@@ -34,9 +34,9 @@ output
 
 archived
 
-files/imported/*.*
-files/scraped/*.*
-files/sliced/*.*
+files/imported/*.MAT
+files/scraped/*.png
+files/sliced/*.jpg
 
 scraper/scraped/
 
