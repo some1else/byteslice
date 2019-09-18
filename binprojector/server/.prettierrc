@@ -1,5 +1,5 @@
 semi: false
-useTabs: false
-tabWidth: 2
+useTabs: true
+tabWidth: 3
 trailingComma: none
 arrowParens: avoid
