@@ -1,7 +1,7 @@
 const MAX_EDGES = 6
 const MAX_ID = 812819
 
-const SEED_DATA = require("./seedData.json")
+const SEED_DATA = require("../files/seedData.json")
 
 const ids = {
   edges: SEED_DATA.edges.reduce(

@@ -13,12 +13,12 @@ const g2 = require("./graph2.js")
 let app = express()
 
 // let data = g2.SEED_DATA
-let data = require("./currentData.json")
+let data = require("../files/currentData.json")
 console.log("Loaded graph.")
 
 function updateData(newData) {
   data = newData
-  fs.writeFile("server/currentData.json", JSON.stringify(data), "utf8", () => {
+  fs.writeFile("files/currentData.json", JSON.stringify(data), "utf8", () => {
     console.log("Wrote graph")
   })
 }
