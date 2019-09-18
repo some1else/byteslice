@@ -37,6 +37,7 @@ archived
 files/imported/*.MAT
 files/scraped/*.png
 files/sliced/*.jpg
+files/currentData.json
 
 scraper/scraped/
 
