@@ -13,8 +13,7 @@ WORKDIR /var/www/app
 COPY . .
 
 RUN ln -s /var/www/files ./files
-RUN ln -s /var/www/files/sliced/ ./public/sliced
+RUN ln -s /var/www/files/sliced ./public/sliced
 
 RUN yarn install
 # RUN yarn build
-

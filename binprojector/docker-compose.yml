@@ -4,7 +4,7 @@ x-nodebase: &nodebase
    build: .
    restart: on-failure
    volumes:
-      - "./files:/var/files"
+      - "./files:/var/www/files"
 
 x-nodeserver: &nodeserver
    <<: *nodebase
