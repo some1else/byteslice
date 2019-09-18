@@ -8,14 +8,15 @@ RUN mkdir -p /var/www/app
 RUN mkdir -p /var/www/app/public
 RUN mkdir -p /var/files
 
+VOLUME ./files /var/files
+
 WORKDIR /var/www/app
 
 COPY . .
 
-VOLUME ./files /var/files
-
 RUN ln -s /var/files ./files
 RUN ln -s /var/files/sliced ./public/sliced
+COPY ./files/seedData.json ./files/currentData.json
 
 RUN yarn install
 # RUN yarn build

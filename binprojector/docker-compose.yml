@@ -1,63 +1,69 @@
 version: "3.7"
 
-x-node: &node
+x-nodebase: &nodebase
    build: .
    restart: on-failure
    volumes:
       - "./files:/var/files"
+
+x-nodeserver: &nodeserver
+   <<: *nodebase
    environment:
       - REDIS_HOST=cache
    depends_on:
       - redis
 
+x-nodeapp: &nodeapp
+   <<: *nodebase
+   environment:
+      - SERVER_HOST=api:3001
+   depends_on:
+      - server
+
+x-nodeworker: &nodeworker
+   <<: *nodebase
+   environment:
+      - REDIS_HOST=cache
+      - SERVER_HOST=api:3001
+   depends_on:
+      - redis
+      - server
+
 services:
    redis:
       image: redis
-      command: redis-server
       container_name: cache
       volumes:
          - "./.data/redis:/var/lib/redis/data"
       expose:
          - 6379
+      command: redis-server
 
    app:
-      <<: *node
+      <<: *nodeapp
       ports:
          - 3000:3000
-      environment:
-         - NODE_ENV=production
       command: sh -c 'yarn build && yarn projector'
 
    server:
-      <<: *node
+      <<: *nodeserver
       container_name: api
       ports:
          - 3001:3001
       command: sh -c 'yarn server'
 
    scraper:
-      <<: *node
+      <<: *nodeworker
       command: sh -c 'yarn scraper'
 
    importer:
-      <<: *node
+      <<: *nodeworker
       command: sh -c 'yarn importer'
-      depends_on:
-         - server
-      environment:
-         - SERVER_HOST=api:3001
+
    slicer:
-      <<: *node
+      <<: *nodeworker
       command: sh -c 'yarn slicer'
-      depends_on:
-         - server
-      environment:
-         - SERVER_HOST=api:3001
 
    runner:
-      <<: *node
+      <<: *nodeworker
       command: sh -c 'yarn runner'
-      depends_on:
-         - server
-      environment:
-         - SERVER_HOST=api:3001
