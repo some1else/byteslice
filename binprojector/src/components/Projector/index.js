@@ -177,7 +177,7 @@ class Projector extends PureComponent {
 			// const futureEdge = getEdge2(edges, vertices, includeVertex, vertex)
 			const lastVisited = lastVisitedMap[vertex.id]
 			const visitationFail = lastVisited && Math(Math.random() * 0.8)
-			new Date().valueOf() - lastVisited.valueOf() < 15 * 60 * 1000
+			// new Date().valueOf() - lastVisited.valueOf() < 15 * 60 * 1000
 			return !!connectingEdge && !visitationFail
 		}
 
