@@ -1,7 +1,7 @@
 #!/bin/sh
 
 while true; do
-	curl http://localhost:3001
+	curl http://$SERVER_HOST/run
 	echo -n "\n";
 	date;
 	sleep 45;

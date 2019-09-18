@@ -32,7 +32,7 @@ app.use(function(req, res, next) {
   next()
 })
 
-app.get("/", (req, res) => {
+app.get("/run", (req, res) => {
   const randomId = Math.floor(
     (g2.MAX_ID / 100) * 99.8 +
       Math.floor(Math.random() * ((g2.MAX_ID / 100) * 0.2))
