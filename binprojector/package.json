@@ -23,7 +23,7 @@
     "importer": "babel-node server/importWorker.js",
     "slicer": "babel-node server/sliceWorker.js",
     "runner": "./binspacial.sh",
-    "purge": "rm -rf files/*/* && cp -f files/seedData.json files/currentData.json",
+    "purge": "rm -rf files/*/* && rm -f files/currentData.json",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
