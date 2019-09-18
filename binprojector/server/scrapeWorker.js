@@ -10,10 +10,11 @@ const queueConf = require("./queue.config.js")
 const scrapeQueue = new Queue("scrape", queueConf)
 const importQueue = new Queue("import", queueConf)
 
-const PIXEL_CMD = file => `convert ${file} \
-	-trim -resize 1x1 \
-	-format "%[fx:int(255*r+.5)],%[fx:int(255*g+.5)],%[fx:int(255*b+.5)]\n" \
-	info:-`
+const formatPixel =
+	"%[fx:int(255*r+.5)],%[fx:int(255*g+.5)],%[fx:int(255*b+.5)]\n"
+
+const PIXEL_CMD = file =>
+	`convert ${file} -trim -resize 1x1 -format "${formatPixel}" info:-`
 
 scrapeQueue.on("ready", () => {
 	scrapeQueue.process(async job => {
