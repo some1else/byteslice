@@ -13,7 +13,12 @@ const g2 = require("./graph2.js")
 let app = express()
 
 // let data = g2.SEED_DATA
-let data = require("../files/currentData.json")
+let data
+try {
+  data = require("../files/currentData.json")
+} catch (e) {
+  data = require("./seedData.json")
+}
 console.log("Loaded graph.")
 
 function updateData(newData) {
