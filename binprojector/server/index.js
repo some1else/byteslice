@@ -1,4 +1,5 @@
 const fs = require("fs")
+const path = require("path")
 
 const express = require("express")
 const Queue = require("bee-queue")
@@ -120,4 +121,24 @@ app.get("/g2/projector", (req, res) => {
 
 app.listen(3001, () => {
   console.log("Listening on port 3001")
+})
+
+app.get("/sliced/:name", function(req, res, next) {
+  var options = {
+    root: path.join(__dirname, "../files/sliced"),
+    dotfiles: "deny",
+    headers: {
+      "x-sent": true
+    }
+  }
+
+  var fileName = req.params.name
+
+  res.sendFile(fileName, options, function(err) {
+    if (err) {
+      next(err)
+    } else {
+      // console.log("Sent:", fileName)
+    }
+  })
 })

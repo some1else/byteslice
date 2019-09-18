@@ -7,7 +7,8 @@ import GraphData from "./components/Projector/GraphData"
 
 import "./App.css"
 
-export const BASEPATH = "/sliced"
+const SERVER_HOST = process.env.SERVER_HOST || "localhost:3001"
+export const BASEPATH = `http://${SERVER_HOST}/sliced`
 export const EXT = "jpg"
 export const STEPS = 50
 
