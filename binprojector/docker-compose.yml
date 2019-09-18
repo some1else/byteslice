@@ -53,3 +53,11 @@ services:
          - server
       environment:
          - SERVER_HOST=api:3001
+
+   runner:
+      <<: *node
+      command: sh -c 'yarn runner'
+      depends_on:
+         - server
+      environment:
+         - SERVER_HOST=api:3001
