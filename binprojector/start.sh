@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+rm -f dump.rdb
+
 rm -rf files
 mkdir files
 mkdir files/scraped
