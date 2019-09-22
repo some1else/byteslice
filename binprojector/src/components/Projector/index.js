@@ -20,6 +20,8 @@ class Projector extends PureComponent {
 		lastMixed: new Date(),
 		lastChanged: new Date(),
 		lastVisitedMap: {},
+		loadedEdgeMap: {},
+		loadedEdges: [],
 	}
 
 	componentDidMount() {
@@ -29,6 +31,24 @@ class Projector extends PureComponent {
 		)
 
 		setTimeout(this.handleEventLoop, duration)
+	}
+
+	handleImageLoaded = (edgeId) => {
+		const { loadedEdgeMap, loadedEdges } = this.state
+		const isEdgeLoaded = loadedEdges.find((id) => id === edgeId)
+
+		if (isEdgeLoaded) return false
+
+		const loadCount = loadedEdgeMap[edgeId] || 0
+		const didEdgeLoad = loadCount >= 50
+
+		this.setState({
+			loadedEdges: didEdgeLoad ? [...loadedEdges, edgeId] : loadedEdges,
+			loadedEdgeMap: {
+				...loadedEdgeMap,
+				[edgeId]: loadCount + 1,
+			},
+		})
 	}
 
 	handleEventLoop = () => {
@@ -90,6 +110,14 @@ class Projector extends PureComponent {
 				excludeVertex: excludeVertex,
 				includeVertex: remainingVertex,
 			})
+
+			if (!incomingVertex) {
+				this.setState({
+					lastChanged: now,
+					lastMixed: now,
+				})
+				return false
+			}
 
 			const newVertA = isMinMix ? vertA : incomingVertex
 			const newVertB = isMaxMix ? vertB : incomingVertex
@@ -158,12 +186,13 @@ class Projector extends PureComponent {
 
 	pickNewVertex({ excludeVertex, includeVertex }) {
 		const { vertices, edges } = this.props
-		const { lastVisitedMap } = this.state
+		const { lastVisitedMap, loadedEdges } = this.state
 
 		const neighboringEdges = edges.filter(
 			(e) =>
 				(e.source === includeVertex.id || e.target === includeVertex.id) &&
-				(e.source !== excludeVertex.id && e.target !== excludeVertex.id),
+				(e.source !== excludeVertex.id && e.target !== excludeVertex.id) &&
+				loadedEdges.indexOf(e.id) > -1,
 		)
 
 		const candidateEdges = neighboringEdges.sort((edgeA, edgeB) => {
@@ -173,6 +202,10 @@ class Projector extends PureComponent {
 			const bTime = bVisit ? bVisit.getTime() : Number.NEGATIVE_INFINITY
 			return aTime - bTime
 		})
+
+		if (candidateEdges.length === 0) {
+			return false
+		}
 
 		const freshEdges = candidateEdges.filter((e) => !lastVisitedMap[e])
 
