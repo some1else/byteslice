@@ -245,7 +245,7 @@ class Projector extends PureComponent {
 		return (
 			<div className="Projector">
 				{loadedEdges < 3 ? (
-					<p>Preloading</p>
+					<h4>Preloading... Please wait</h4>
 				) : (
 					<EdgeMix
 						edge={edge}

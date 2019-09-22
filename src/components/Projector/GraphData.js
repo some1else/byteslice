@@ -32,7 +32,7 @@ class GraphData extends PureComponent {
 		if (isLoaded && edges.length > 1) {
 			return children && children({ edges, vertices })
 		} else {
-			return <h1>Scraping. Please wait</h1>
+			return <h4>Scraping... Please wait</h4>
 		}
 	}
 }

@@ -103,11 +103,12 @@ class EdgeMix extends PureComponent {
 			bottom: "1rem",
 			right: "1rem",
 			// transform: "translate(-50%, -50%)",
-			fontSize: "1rem",
-			fontWeight: "bold",
+			fontSize: "calc(1rem / 16 * 12)",
+			fontWeight: "normal",
 			mixBlendMode: "exclusion",
-			color: "black",
-			background: "white",
+			// color: "black",
+			// background: "white",
+			color: "white",
 			padding: "0.3rem",
 		}
 
@@ -119,7 +120,7 @@ class EdgeMix extends PureComponent {
 						<br />
 						Edge #{edge.id}
 						<br />
-						Vert #{edge.source} - #{edge.target}
+						Loc #{edge.source} &amp; #{edge.target}
 						<br />
 						{edges.length} edges
 						<br />

@@ -1,13 +1,12 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  font-family: "IBM Plex Sans", "Menlo", "Monaco", monospace,
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: black;
-  background-image: url('/tvnoise.gif');
-  background-size: cover;
+  /* background-image: url('/tvnoise.gif');
+  background-size: cover; */
   color: white;
 }
 
