@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-rm -f dump.rdb
+rm -rf .data
 
 rm -rf files
 mkdir files
