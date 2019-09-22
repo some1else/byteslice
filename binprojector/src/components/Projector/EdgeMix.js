@@ -67,7 +67,9 @@ class EdgeMix extends PureComponent {
 
 		if (!edge) return <div />
 
+		// TODO: Restore slice directionality
 		let isInverted = false
+
 		if (prevEdge) {
 			const commonVert = findCommonVertex(edge, prevEdge)
 			if (edge.source === commonVert) {
@@ -89,7 +91,7 @@ class EdgeMix extends PureComponent {
 				data: { file: imageBFile },
 			} = imageB
 
-			adjustedMix = true ? STEPS - actualMix : actualMix
+			adjustedMix = isInverted ? STEPS - actualMix : actualMix
 
 			const mixURL = `${BASEPATH}/${imageAFile}.${imageBFile}.MAT-${adjustedMix}.MAT.${EXT}`
 

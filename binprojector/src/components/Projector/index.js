@@ -52,7 +52,7 @@ class Projector extends PureComponent {
 	}
 
 	handleEventLoop = () => {
-		const { edges, vertices, onEdgeChanged } = this.props
+		const { edges, onEdgeChanged } = this.props
 		const {
 			lastChanged,
 			vertA,
@@ -102,8 +102,8 @@ class Projector extends PureComponent {
 			const excludeVertex = isMinMix ? vertB : isMaxMix ? vertA : null
 
 			if (remainingVertex === null || excludeVertex === null) {
-				throw new Error("No remaining or excluded vertices")
 				debugger
+				throw new Error("No remaining or excluded vertices")
 			}
 
 			const incomingVertex = this.pickNewVertex({
@@ -123,15 +123,15 @@ class Projector extends PureComponent {
 			const newVertB = isMaxMix ? vertB : incomingVertex
 
 			if (!edges || !newVertA || !newVertB) {
-				throw new Error("No edges or new vertices")
 				debugger
+				throw new Error("No edges or new vertices")
 			}
 
 			const edge = getConnectingEdge(edges, newVertA, newVertB)
 
 			if (!edge) {
-				throw new Error("No connecting edge")
 				debugger
+				throw new Error("No connecting edge")
 			}
 
 			const ts = new Date()
@@ -218,7 +218,6 @@ class Projector extends PureComponent {
 				freshEdge.source !== includeVertex.id
 					? freshEdge.source
 					: freshEdge.target
-			console.log("freshVertex", freshEdge, newVertId)
 		} else {
 			const staleEdge = candidateEdges[0]
 			newVertId =
@@ -226,7 +225,6 @@ class Projector extends PureComponent {
 				staleEdge.source !== includeVertex.id
 					? staleEdge.source
 					: staleEdge.target
-			console.log("stale vertex", staleEdge, newVertId)
 		}
 
 		return vertices.find((v) => v.id === newVertId)
