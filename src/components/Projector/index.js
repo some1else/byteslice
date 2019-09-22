@@ -231,19 +231,23 @@ class Projector extends PureComponent {
 	}
 
 	render() {
-		const { edge, prevEdge, mix } = this.state
+		const { edge, prevEdge, mix, loadedEdges } = this.state
 		const { edges, vertices, onMixChanged } = this.props
 
 		return (
 			<div className="Projector">
-				<EdgeMix
-					edge={edge}
-					prevEdge={prevEdge}
-					edges={edges}
-					vertices={vertices}
-					mix={mix}
-					onMixChanged={onMixChanged}
-				/>
+				{loadedEdges < 3 ? (
+					<p>Preloading</p>
+				) : (
+					<EdgeMix
+						edge={edge}
+						prevEdge={prevEdge}
+						edges={edges}
+						vertices={vertices}
+						mix={mix}
+						onMixChanged={onMixChanged}
+					/>
+				)}
 				<ImagePreloader
 					edges={edges}
 					vertices={vertices}
