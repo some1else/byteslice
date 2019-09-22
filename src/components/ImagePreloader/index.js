@@ -63,7 +63,12 @@ class ImagePreloader extends PureComponent {
 			images: getEdgeImages(edge, vertices),
 		}
 
-		const neighbors = getNeighboringEdges(edges, vertices, edge)
+		const isPreloaded = (edge) => preloadedEdges.indexOf(edge) > -1
+
+		const neighbors = getNeighboringEdges(edges, vertices, edge).filter(
+			(edge) => !isPreloaded(edge),
+		)
+
 		const neighborImages = neighbors.map((e) => ({
 			id: e.id,
 			images: getEdgeImages(e, vertices),
@@ -74,16 +79,17 @@ class ImagePreloader extends PureComponent {
 			preloadedEdges: [
 				...preloadedEdges,
 				// New neighbors
-				...neighbors.filter((n) => preloadedEdges.indexOf(n) === -1),
+				...neighbors.filter((neighbor) => !isPreloaded(neighbor)),
 				// Current edge, if new
-				preloadedEdges.indexOf(edge) === -1 && edge,
+				!isPreloaded(edge) && edge,
 			],
 		})
 	}
 
 	render() {
-		const { onImageLoaded } = this.props
-		const { currentNeighborhood } = this.state
+		const { onImageLoaded, vertices } = this.props
+		const { currentNeighborhood, preloadedEdges } = this.state
+
 		return (
 			<Fragment>
 				{currentNeighborhood.map((edge) =>
