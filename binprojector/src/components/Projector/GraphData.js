@@ -6,7 +6,7 @@ class GraphData extends PureComponent {
 	state = {
 		edges: [],
 		vertices: [],
-		isLoaded: false
+		isLoaded: false,
 	}
 
 	async fetchGraph() {
@@ -29,10 +29,10 @@ class GraphData extends PureComponent {
 	render() {
 		const { edges, vertices, isLoaded } = this.state
 		const { children } = this.props
-		if (isLoaded) {
+		if (isLoaded && edges.length > 1) {
 			return children && children({ edges, vertices })
 		} else {
-			return null
+			return <h1>Scraping. Please wait</h1>
 		}
 	}
 }
