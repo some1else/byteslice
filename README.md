@@ -1,6 +1,6 @@
 # Byteslice prototype
 
-Slice TIFF images
+Code-bendy transitions between recent screens from various insecure IoT cameras.
 
 ## Requirements
 
