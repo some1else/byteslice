@@ -24,7 +24,7 @@ const RES = `512x360\!`
 
 async function importImage(data) {
 	const { file, camId } = data
-	const convertCmd = `convert files/scraped/${file} -define profile:skip="*" -trim -clamp -resize ${RES} -colorspace sRGB files/imported/${file}.MAT`
+	const convertCmd = `convert files/scraped/${file} -set colorspace RGB -trim -resize ${RES} -depth 8 -type TrueColor files/imported/${file}.MAT`
 	console.log(convertCmd)
 	const { stdout, stderr } = await exec(convertCmd)
 	console.log(stdout, stderr)
