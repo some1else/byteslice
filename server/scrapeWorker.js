@@ -16,6 +16,8 @@ const formatPixel =
 const PIXEL_CMD = file =>
 	`convert ${file} -trim -resize 1x1 -format "${formatPixel}" info:-`
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 scrapeQueue.on("ready", () => {
 	scrapeQueue.process(async job => {
 		console.log("Processing", job.data)
@@ -31,7 +33,7 @@ scrapeQueue.on("ready", () => {
 				const file = capture.substr(9, capture.length - 1)
 				console.log("File:", file)
 
-				const check = await isNotTooDarkOrBright(file)
+				const check = await isImageSuitable(file)
 				if (check) {
 					const job = importQueue.createJob({ file, camId: randomId })
 					job.save(logSave)
@@ -44,6 +46,7 @@ scrapeQueue.on("ready", () => {
 				console.error("Retrying. Unsucessful capture.")
 				randomId = getNewRandomId()
 			}
+			await sleep(2000)
 		}
 		return { ...job.data, stdout, stderr }
 	})
@@ -67,9 +70,10 @@ function logSave(err, job) {
 	}
 }
 
-async function isNotTooDarkOrBright(file) {
+async function isImageSuitable(file) {
 	const isTooDark = false
 	const isTooBright = false
+	const isMonochrome = false
 	const resizeCmd = PIXEL_CMD(`files/scraped/${file}`)
 
 	console.log(resizeCmd)
@@ -84,15 +88,21 @@ async function isNotTooDarkOrBright(file) {
 	const [r, g, b] = stdout.split(",").map(c => parseFloat(c))
 	console.log("Checking color:", r, g, b)
 
-	const color = new Color({ r, g, b })
-	const luma = color.luminosity()
+	const avg = (r + g + b) / 3
 
-	if (luma > 0.99) isTooBright = true
-	if (luma < 0.01) isTooDark = true
+	if (avg < 0 + 8) {
+		isTooDark = true
+	}
+	if (avg > 255 - 8) {
+		isTooDark = true
+	}
+	if (((r === g) === b) === avg) {
+		isMonochrome = true
+	}
 
-	console.log("Luma:", luma)
+	console.log("Avg:", avg, isTooDark, isTooBright, isMonochrome)
 
-	return !isTooDark && !isTooBright
+	return !isTooDark && !isTooBright && !isMonochrome
 }
 
 function getNewRandomId() {
