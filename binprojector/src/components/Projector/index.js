@@ -81,27 +81,35 @@ class Projector extends PureComponent {
 			const excludeVertex = isMinMix ? vertB : isMaxMix ? vertA : null
 
 			if (remainingVertex === null || excludeVertex === null) {
-				throw new Error("Alo")
+				throw new Error("No remaining or excluded vertices")
+				debugger
 			}
 
 			const incomingVertex = this.pickNewVertex({
-				excludeVertices: [excludeVertex],
+				excludeVertex: excludeVertex,
 				includeVertex: remainingVertex,
 			})
 
 			const newVertA = isMinMix ? vertA : incomingVertex
 			const newVertB = isMaxMix ? vertB : incomingVertex
 
-			const edge = getEdge2(vertices, edges, newVertA, newVertB)
+			if (!edges || !newVertA || !newVertB) {
+				throw new Error("No edges or new vertices")
+				debugger
+			}
 
-			// const isConnected = connectsVertices(edge, newVertA, newVertB)
+			const edge = getConnectingEdge(edges, newVertA, newVertB)
+
+			if (!edge) {
+				throw new Error("No connecting edge")
+				debugger
+			}
 
 			const ts = new Date()
 
 			const newLastVisitedMap = {
 				...lastVisitedMap,
-				[newVertA.id]: ts,
-				[newVertB.id]: ts,
+				[edge.id]: ts,
 			}
 
 			this.setState({
@@ -147,48 +155,47 @@ class Projector extends PureComponent {
 		return newMix
 	}
 
-	randomVertex(excludeVertexIds = [], filterCond = (v) => true) {
-		const { vertices } = this.props
-		const verticesLength = vertices.length
-		const randomIndex = () => Math.floor(Math.random() * verticesLength)
-		let randomVertex = vertices[randomIndex()]
-		while (
-			excludeVertexIds.indexOf(randomVertex.id) > -1 ||
-			!filterCond(randomVertex)
-		) {
-			randomVertex = vertices[randomIndex()]
-		}
-		return randomVertex
-	}
-
-	pickNewVertex({ excludeVertices, includeVertex }) {
+	pickNewVertex({ excludeVertex, includeVertex }) {
 		const { vertices, edges } = this.props
 		const { lastVisitedMap } = this.state
 
-		const excludeVertexIds = excludeVertices
-			.map((vert) => vert.id)
-			.concat(includeVertex.id)
+		const neighboringEdges = edges.filter(
+			(e) =>
+				(e.source === includeVertex.id || e.target === includeVertex.id) &&
+				(e.source !== excludeVertex.id && e.target !== excludeVertex.id),
+		)
 
-		const connectCondition = (vertex) => {
-			const connectingEdge = edges.find((edge) =>
-				connectsVertices(edge, includeVertex, vertex),
-			)
-			// visitation
-			// const futureEdge = getEdge2(edges, vertices, includeVertex, vertex)
-			const lastVisited = lastVisitedMap[vertex.id]
-			const visitationFail = lastVisited && Math.round(Math.random() * 0.8)
-			// new Date().valueOf() - lastVisited.valueOf() < 15 * 60 * 1000
-			return !!connectingEdge && !visitationFail
+		const candidateEdges = neighboringEdges.sort((edgeA, edgeB) => {
+			const aVisit = lastVisitedMap[edgeA.id]
+			const aTime = aVisit ? aVisit.getTime() : Number.NEGATIVE_INFINITY
+			const bVisit = lastVisitedMap[edgeB.id]
+			const bTime = bVisit ? bVisit.getTime() : Number.NEGATIVE_INFINITY
+			return aTime - bTime
+		})
+
+		const freshEdges = candidateEdges.filter((e) => !lastVisitedMap[e])
+
+		let newVertId
+
+		if (freshEdges.length > 0) {
+			const freshEdge = freshEdges[0]
+			newVertId =
+				freshEdge.source !== excludeVertex.id &&
+				freshEdge.source !== includeVertex.id
+					? freshEdge.source
+					: freshEdge.target
+			console.log("freshVertex", freshEdge, newVertId)
+		} else {
+			const staleEdge = candidateEdges[0]
+			newVertId =
+				staleEdge.source !== excludeVertex.id &&
+				staleEdge.source !== includeVertex.id
+					? staleEdge.source
+					: staleEdge.target
+			console.log("stale vertex", staleEdge, newVertId)
 		}
 
-		let incomingVertex = this.randomVertex(excludeVertexIds, connectCondition)
-
-		while (!getEdge2(vertices, edges, includeVertex, incomingVertex)) {
-			// keep picking new random vertex
-			incomingVertex = this.randomVertex(excludeVertexIds, connectCondition)
-		}
-
-		return incomingVertex
+		return vertices.find((v) => v.id === newVertId)
 	}
 
 	render() {
@@ -217,7 +224,7 @@ function connectsVertices(edge, vertA, vertB) {
 		: false
 }
 
-function getEdge2(vertices, edges, vertA, vertB) {
+function getConnectingEdge(edges, vertA, vertB) {
 	const edge = edges.find((edge) => connectsVertices(edge, vertA, vertB))
 	return edge
 }
