@@ -116,6 +116,14 @@ class Projector extends PureComponent {
 					lastChanged: now,
 					lastMixed: now,
 				})
+
+				const duration = randomBetween(
+					CROSSFADE_INTERVALS[0],
+					CROSSFADE_INTERVALS[1],
+				)
+
+				setTimeout(this.handleEventLoop, duration)
+
 				return false
 			}
 
