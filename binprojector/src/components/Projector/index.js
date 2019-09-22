@@ -1,6 +1,7 @@
 import React, { PureComponent } from "react"
 
 import EdgeMix from "./EdgeMix"
+import ImagePreloader from "../ImagePreloader"
 
 import "./styles.css"
 
@@ -211,6 +212,12 @@ class Projector extends PureComponent {
 					vertices={vertices}
 					mix={mix}
 					onMixChanged={onMixChanged}
+				/>
+				<ImagePreloader
+					edges={edges}
+					vertices={vertices}
+					edge={edge}
+					onImageLoaded={this.handleImageLoaded}
 				/>
 			</div>
 		)

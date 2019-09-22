@@ -1,8 +1,7 @@
-import React, { PureComponent, Fragment } from "react"
+import React, { PureComponent } from "react"
 import WebMidi from "webmidi"
 
 import Projector from "./components/Projector"
-import ImagePreloader from "./components/ImagePreloader"
 import GraphData from "./components/Projector/GraphData"
 
 import "./App.css"
@@ -59,25 +58,16 @@ class App extends PureComponent {
 	}
 
 	render() {
-		const { edge } = this.state
 		return (
 			<div className="App">
 				<GraphData>
 					{({ edges, vertices }) => (
-						<Fragment>
-							<Projector
-								edges={edges}
-								vertices={vertices}
-								onEdgeChanged={this.onEdgeChanged}
-								onMixChanged={this.onMixChanged}
-							/>
-
-							<ImagePreloader
-								edges={edges}
-								vertices={vertices}
-								edge={edge}
-							/>
-						</Fragment>
+						<Projector
+							edges={edges}
+							vertices={vertices}
+							onEdgeChanged={this.onEdgeChanged}
+							onMixChanged={this.onMixChanged}
+						/>
 					)}
 				</GraphData>
 			</div>
