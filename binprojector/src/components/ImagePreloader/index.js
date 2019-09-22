@@ -34,50 +34,69 @@ function getNeighboringEdges(edges, vertices, edge) {
 class ImagePreloader extends PureComponent {
 	state = {
 		preloadedEdges: [],
-		preloadedImages: [],
+		currentNeighborhood: [],
 	}
 
-	componentWillMount() {
-		const { edge, edges = [], vertices = [] } = this.props
+	componentDidMount() {
+		const { edge } = this.props
+		this.updateNeighborhood(edge)
 	}
 
 	componentDidUpdate(prevProps) {
-		const { edge, edges = [], vertices = [] } = this.props
+		const { edge: prevEdge } = prevProps
+		const { edge } = this.props
 		const { preloadedEdges } = this.state
 
 		if (preloadedEdges.indexOf(edge) > -1) return false
 
-		const { edge: prevEdge } = prevProps
 		if (prevEdge !== edge) {
-			// const newImages = getEdgeImages(edge, vertices)
-			const neighbors = getNeighboringEdges(edges, vertices, edge)
-			const newImages = neighbors
-				.map((e) => getEdgeImages(e, vertices))
-				.flat()
-			this.setState({
-				preloadedImages: newImages,
-				preloadedEdges: [
-					...preloadedEdges,
-					...neighbors.filter((n) => preloadedEdges.indexOf(n) === -1),
-					preloadedEdges.indexOf(edge) === -1 && edge,
-				],
-			})
+			this.updateNeighborhood(edge)
 		}
 	}
 
-	render() {
-		const { preloadedImages } = this.state
+	updateNeighborhood(edge) {
+		const { edges, vertices } = this.props
+		const { preloadedEdges } = this.state
 
+		const edgeImages = {
+			id: edge.id,
+			images: getEdgeImages(edge, vertices),
+		}
+
+		const neighbors = getNeighboringEdges(edges, vertices, edge)
+		const neighborImages = neighbors.map((e) => ({
+			id: e.id,
+			images: getEdgeImages(e, vertices),
+		}))
+
+		this.setState({
+			currentNeighborhood: [edgeImages, ...neighborImages],
+			preloadedEdges: [
+				...preloadedEdges,
+				// New neighbors
+				...neighbors.filter((n) => preloadedEdges.indexOf(n) === -1),
+				// Current edge, if new
+				preloadedEdges.indexOf(edge) === -1 && edge,
+			],
+		})
+	}
+
+	render() {
+		const { onImageLoaded } = this.props
+		const { currentNeighborhood } = this.state
 		return (
 			<Fragment>
-				{preloadedImages.map((img, i) => (
-					<img
-						key={`preload-${img}-${i}`}
-						src={img}
-						style={imgStyle}
-						alt=""
-					/>
-				))}
+				{currentNeighborhood.map((edge) =>
+					edge.images.map((img, i) => (
+						<img
+							key={`preload-${img}-${i}`}
+							src={img}
+							style={imgStyle}
+							alt=""
+							onLoad={() => onImageLoaded(edge.id)}
+						/>
+					)),
+				)}
 			</Fragment>
 		)
 	}
