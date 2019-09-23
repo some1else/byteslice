@@ -8,8 +8,8 @@ import "./styles.css"
 const MIX_MIN = 0
 const MIX_MAX = 50
 
-const CROSSFADE_INTERVALS = [64 * 1, 1 * 192]
-const NEW_PAIR_INTERVALS = [1024 * 1, 1 * 2048]
+const CROSSFADE_INTERVALS = [64 * 1, 192 * 1]
+const NEW_PAIR_INTERVALS = [1024 * 2, 2048 * 2]
 
 class Projector extends PureComponent {
 	state = {

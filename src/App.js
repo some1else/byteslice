@@ -23,11 +23,11 @@ class App extends PureComponent {
 			const textureA = edge.source % 12
 			const textureB = edge.target % 12
 			this.midiOut
-				.playNote(textureA + 60, "all")
-				.stopNote(textureA + 60, "all", { time: 100 })
+				.playNote(textureA + 60 + 12, "all")
+				.stopNote(textureA + 60 + 12, "all", { time: 100 })
 			this.midiOut
-				.playNote(textureB + 72, "all")
-				.stopNote(textureB + 72, "all", { time: 100 })
+				.playNote(textureB + 72 + 12, "all")
+				.stopNote(textureB + 72 + 12, "all", { time: 100 })
 		}
 	}
 
