@@ -96,7 +96,7 @@ async function isImageSuitable(file) {
 	if (avg > 255 - 8) {
 		isTooDark = true
 	}
-	if (((r === g) === b) === avg) {
+	if (r === g && g === b && b === avg) {
 		isMonochrome = true
 	}
 
