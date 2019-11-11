@@ -1,8 +1,10 @@
-import React, { PureComponent } from "react"
-import WebMidi from "webmidi"
+import React, { PureComponent, Fragment } from "react"
+// import WebMidi from "webmidi"
+import { Howler, Howl } from "howler"
 
 import Projector from "./components/Projector"
 import GraphData from "./components/Projector/GraphData"
+import AudioPlayer from "./components/AudioPlayer"
 
 import "./App.css"
 
@@ -22,6 +24,7 @@ class App extends PureComponent {
 		if (this.midiOut) {
 			const textureA = edge.source % 12
 			const textureB = edge.target % 12
+
 			this.midiOut
 				.playNote(textureA + 60 + 12, "all")
 				.stopNote(textureA + 60 + 12, "all", { time: 100 })
@@ -41,23 +44,25 @@ class App extends PureComponent {
 			)
 	}
 
-	componentWillMount() {
-		WebMidi.enable((err) => {
-			if (!err) {
-				this.midiOut = WebMidi.getOutputByName("ByteSliceMix")
-				if (this.midiOut) {
-					this.midiOut
-						.playNote(60, "all")
-						.stopNote(60, "all", { time: 100 })
-					this.midiOut
-						.playNote(72, "all")
-						.stopNote(72, "all", { time: 100 })
-				}
-			}
-		})
-	}
+	// componentWillMount() {
+	// 	WebMidi.enable((err) => {
+	// 		if (!err) {
+	// 			this.midiOut = WebMidi.getOutputByName("ByteSliceMix")
+	// 			if (this.midiOut) {
+	// 				this.midiOut
+	// 					.playNote(60, "all")
+	// 					.stopNote(60, "all", { time: 100 })
+	// 				this.midiOut
+	// 					.playNote(72, "all")
+	// 					.stopNote(72, "all", { time: 100 })
+	// 			}
+	// 		}
+	// 	})
+	// }
 
 	render() {
+		const { edge, mix } = this.state
+
 		return (
 			<div className="App">
 				<GraphData>
@@ -70,6 +75,7 @@ class App extends PureComponent {
 						/>
 					)}
 				</GraphData>
+				<AudioPlayer edge={edge} mix={mix} />
 			</div>
 		)
 	}
