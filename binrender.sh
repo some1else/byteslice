@@ -23,6 +23,8 @@ do
 	NAME=$(echo "$OUTPUT_NAME-$i.$EXTENSION")
 	echo "* Rendering slice $NAME"
 	./binbyteslice.sh $IMAGE_A $IMAGE_B $i $NAME $EXTENSION 50
+	sleep 0.25
 	convert $NAME -quality 100 $NAME.jpg 1>/dev/null
+	sleep 0.25
 	rm -f $NAME
 done

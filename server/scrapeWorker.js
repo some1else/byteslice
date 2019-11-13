@@ -5,7 +5,7 @@ const Color = require("color")
 const MAX_ID = require("./graph2.js").MAX_ID
 
 const RETRY_TIMEOUT = 2 * 1000
-const HISTORY_PERCENTAGE = 4
+const HISTORY_PERCENTAGE = 1
 
 const Queue = require("bee-queue")
 const queueConf = require("./queue.config.js")
