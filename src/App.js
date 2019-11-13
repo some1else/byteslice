@@ -1,5 +1,5 @@
 import React, { PureComponent, Fragment } from "react"
-// import WebMidi from "webmidi"
+import WebMidi from "webmidi"
 import { Howler, Howl } from "howler"
 
 import Projector from "./components/Projector"
@@ -13,6 +13,9 @@ export const BASEPATH = `http://${SERVER_HOST}/sliced`
 export const EXT = "jpg"
 export const STEPS = 50
 
+const isAudioEnabled = process.env.REACT_APP_AUDIO_ENABLED === "true"
+const isMIDIEnabled = process.env.REACT_APP_MIDI_ENABLED === "true"
+
 class App extends PureComponent {
 	state = {
 		edge: null,
@@ -21,7 +24,7 @@ class App extends PureComponent {
 
 	onEdgeChanged = ({ edge }) => {
 		this.setState({ edge })
-		if (this.midiOut) {
+		if (isMIDIEnabled && this.midiOut) {
 			const textureA = edge.source % 12
 			const textureB = edge.target % 12
 
@@ -36,7 +39,8 @@ class App extends PureComponent {
 
 	onMixChanged = (mix) => {
 		this.setState({ mix })
-		this.midiOut &&
+		isMIDIEnabled &&
+			this.midiOut &&
 			this.midiOut.sendControlChange(
 				"modulationwheelfine",
 				Math.floor((mix / STEPS) * 127),
@@ -44,21 +48,23 @@ class App extends PureComponent {
 			)
 	}
 
-	// componentWillMount() {
-	// 	WebMidi.enable((err) => {
-	// 		if (!err) {
-	// 			this.midiOut = WebMidi.getOutputByName("ByteSliceMix")
-	// 			if (this.midiOut) {
-	// 				this.midiOut
-	// 					.playNote(60, "all")
-	// 					.stopNote(60, "all", { time: 100 })
-	// 				this.midiOut
-	// 					.playNote(72, "all")
-	// 					.stopNote(72, "all", { time: 100 })
-	// 			}
-	// 		}
-	// 	})
-	// }
+	componentWillMount() {
+		if (isMIDIEnabled) {
+			WebMidi.enable((err) => {
+				if (!err) {
+					this.midiOut = WebMidi.getOutputByName("ByteSliceMix")
+					if (this.midiOut) {
+						this.midiOut
+							.playNote(60, "all")
+							.stopNote(60, "all", { time: 100 })
+						this.midiOut
+							.playNote(72, "all")
+							.stopNote(72, "all", { time: 100 })
+					}
+				}
+			})
+		}
+	}
 
 	render() {
 		const { edge, mix } = this.state
@@ -75,7 +81,7 @@ class App extends PureComponent {
 						/>
 					)}
 				</GraphData>
-				<AudioPlayer edge={edge} mix={mix} />
+				{isAudioEnabled && <AudioPlayer edge={edge} mix={mix} />}
 			</div>
 		)
 	}
