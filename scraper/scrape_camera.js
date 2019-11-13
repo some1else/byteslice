@@ -17,7 +17,7 @@ const { disableImagesAndScripts } = require("./utils.js")
 
 	const response = await page.goto(camstreamURL, {
 		waitUntil: "load",
-		timeout: 30 * 1000,
+		timeout: 15000,
 	})
 
 	if (response.status() === 200) {
@@ -45,13 +45,13 @@ async function tryImage(browser, imageSource, camId) {
 		if (resp.url() === "http://www.insecam.org/static/no.jpg") {
 			respError = true
 		}
-		respError && console.error("ERROR:", "resp.url() is", resp.url())
+		# respError && console.error("ERROR:", "resp.url() is", resp.url())
 	})
 
 	try {
 		resp = await newPage.goto(imageSource, {
 			waitUntil: "load",
-			timeout: 200,
+			timeout: 20000,
 		})
 
 		if (!respError) {
@@ -62,7 +62,7 @@ async function tryImage(browser, imageSource, camId) {
 			})
 			console.log("CAPTURE:", image)
 		} else {
-			console.error("ERROR: LOADED SUCCESSFULLY")
+			console.error("ERROR: LOADED PLACEHOLDER IMAGE")
 		}
 	} catch (e) {
 		if (!respError) {

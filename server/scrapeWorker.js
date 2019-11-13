@@ -46,7 +46,7 @@ scrapeQueue.on("ready", () => {
 				console.error("Retrying. Unsucessful capture.")
 				randomId = getNewRandomId()
 			}
-			await sleep(2000)
+			await sleep(20)
 		}
 		return { ...job.data, stdout, stderr }
 	})
@@ -107,7 +107,7 @@ async function isImageSuitable(file) {
 
 function getNewRandomId() {
 	const randomId = Math.floor(
-		(MAX_ID / 100) * 99.8 + Math.floor(Math.random() * ((MAX_ID / 100) * 0.2))
+		(MAX_ID / 100) * 98 + Math.floor(Math.random() * ((MAX_ID / 100) * 2))
 	)
 	return randomId
 }
