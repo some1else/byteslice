@@ -13,7 +13,6 @@ const g2 = require("./graph2.js")
 
 let app = express()
 
-// let data = g2.SEED_DATA
 let data
 try {
   data = require("../files/currentData.json")
@@ -36,6 +35,10 @@ app.use(function(req, res, next) {
     "Origin, X-Requested-With, Content-Type, Accept"
   )
   next()
+})
+
+app.get("/count", (req, res) => {
+  res.send(data.vertices.length.toString())
 })
 
 app.get("/run", (req, res) => {
