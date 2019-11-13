@@ -4,6 +4,9 @@ const Color = require("color")
 
 const MAX_ID = require("./graph2.js").MAX_ID
 
+const RETRY_TIMEOUT = 2 * 1000
+const HISTORY_PERCENTAGE = 4
+
 const Queue = require("bee-queue")
 const queueConf = require("./queue.config.js")
 
@@ -46,7 +49,7 @@ scrapeQueue.on("ready", () => {
 				console.error("Retrying. Unsucessful capture.")
 				randomId = getNewRandomId()
 			}
-			await sleep(20)
+			await sleep(RETRY_TIMEOUT)
 		}
 		return { ...job.data, stdout, stderr }
 	})
@@ -107,7 +110,8 @@ async function isImageSuitable(file) {
 
 function getNewRandomId() {
 	const randomId = Math.floor(
-		(MAX_ID / 100) * 98 + Math.floor(Math.random() * ((MAX_ID / 100) * 2))
+		(MAX_ID / 100) * (100 - HISTORY_PERCENTAGE) +
+			Math.floor(Math.random() * ((MAX_ID / 100) * HISTORY_PERCENTAGE))
 	)
 	return randomId
 }

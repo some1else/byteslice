@@ -2,6 +2,8 @@ const NEW_CAMS_URL = "http://www.insecam.org/en/bynew/"
 
 const CAM_ID = process.argv[2]
 
+const LOAD_TIMEOUT = 15 * 1000
+
 const fs = require("fs")
 const puppeteer = require("puppeteer")
 const puppeteerConf = require("./puppeteer.config.js")
@@ -17,7 +19,7 @@ const { disableImagesAndScripts } = require("./utils.js")
 
 	const response = await page.goto(camstreamURL, {
 		waitUntil: "load",
-		timeout: 15000,
+		timeout: LOAD_TIMEOUT,
 	})
 
 	if (response.status() === 200) {
@@ -45,13 +47,13 @@ async function tryImage(browser, imageSource, camId) {
 		if (resp.url() === "http://www.insecam.org/static/no.jpg") {
 			respError = true
 		}
-		# respError && console.error("ERROR:", "resp.url() is", resp.url())
+		// respError && console.error("ERROR:", "resp.url() is", resp.url())
 	})
 
 	try {
 		resp = await newPage.goto(imageSource, {
 			waitUntil: "load",
-			timeout: 20000,
+			timeout: LOAD_TIMEOUT,
 		})
 
 		if (!respError) {
@@ -66,7 +68,7 @@ async function tryImage(browser, imageSource, camId) {
 		}
 	} catch (e) {
 		if (!respError) {
-			await newPage.waitFor(7000)
+			await newPage.waitFor(LOAD_TIMEOUT)
 			if (newPage.url() !== "http://www.insecam.org/static/no.jpg") {
 				const ts = new Date().getTime()
 				const image = `cam-${camId}-time-${ts}.png`
