@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-rm -rf .data
+sudo rm -rf .data
 
-rm -rf files
+sudo rm -rf files
 
 mkdir files
 mkdir files/scraped
