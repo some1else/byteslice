@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const MIN_COUNT = 150
-const MAX_COUNT = 420
-const DEFAULT_SLEEP = 90
+const MIN_COUNT = 200
+const MAX_COUNT = 240
+const DEFAULT_SLEEP = 30
 
 const util = require("util")
 const exec = util.promisify(require("child_process").exec)

@@ -3,10 +3,29 @@
 echo Archiving files
 ./archive.sh
 
-sleep 10
 echo Cleaning work directory
 ./reset.sh
 
-sleep 10
-echo Launching server, app, workers and kiosk
-./start.sh
+echo Running containers
+docker-compose up -d
+
+echo Waiting four hours
+sleep 3600
+echo Restarting scraper
+docker-compose restart scraper
+echo Waiting three hours
+sleep 3600
+echo Restarting scraper
+docker-compose restart scraper
+echo Waiting two hours
+sleep 3600
+echo Restarting scraper
+docker-compose restart scraper
+echo Waiting one hour
+sleep 3600
+
+echo Stopping containers
+docker-compose stop
+
+echo Restarting server, app and kiosk
+sudo shutdown -r now
