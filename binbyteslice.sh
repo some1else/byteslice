@@ -36,15 +36,15 @@ TOTAL_BYTES_A=$(wc -c $IMAGE_A | awk '{print $1}')
 TOTAL_BYTES_B=$(wc -c $IMAGE_B | awk '{print $1}')
 
 # Determine number of BYTES for image A
-IMAGE_A_BYTES_RESULT=$(echo "$TOTAL_BYTES_A * $PROGRESS / $STEPS" | bc -l)
+IMAGE_A_BYTES_RESULT=$(echo "(($TOTAL_BYTES_A - 2) * $PROGRESS / $STEPS) + 2" | bc -l)
 IMAGE_A_BYTES_FLOAT=$(printf %.2f $(echo "$IMAGE_A_BYTES_RESULT" | bc -l))
 IMAGE_A_BYTES=$(echo "$IMAGE_A_BYTES_FLOAT" | rev | cut -c4- | rev)
 
 # Determine number of BYTES for image B
-IMAGE_B_SKIP_RESULT=$(echo "$TOTAL_BYTES_B * $PROGRESS / $STEPS" | bc -l)
-IMAGE_B_SKIP_FLOAT=$(printf %.2f $(echo "$IMAGE_B_SKIP_RESULT" | bc -l))
+IMAGE_B_SKIP_RESULT=$(echo "($TOTAL_BYTES_B - 2) * $PROGRESS / $STEPS" | bc -l)
+IMAGE_B_SKIP_FLOAT=$(printf %.2f $(echo "$IMAGE_B_SKIP_RESULT + 2" | bc -l))
 IMAGE_B_SKIP=$(echo "$IMAGE_B_SKIP_FLOAT" | rev | cut -c4- | rev)
-IMAGE_B_BYTES_RESULT=$(echo "$TOTAL_BYTES_B * ($STEPS - $PROGRESS) / $STEPS" | bc -l)
+IMAGE_B_BYTES_RESULT=$(echo "($TOTAL_BYTES_B * ($STEPS - $PROGRESS) / $STEPS)" | bc -l)
 IMAGE_B_BYTES_FLOAT=$(printf %.2f $(echo "$IMAGE_B_BYTES_RESULT" | bc -l))
 IMAGE_B_BYTES=$(echo "$IMAGE_B_BYTES_FLOAT" | rev | cut -c4- | rev)
 

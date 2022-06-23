@@ -52,9 +52,9 @@ services:
          - 3001:3001
       command: sh -c 'yarn server'
 
-   scraper:
-      <<: *nodeworker
-      command: sh -c 'yarn scraper'
+   # scraper:
+   #    <<: *nodeworker
+   #    command: sh -c 'yarn scraper'
 
    importer:
       <<: *nodeworker
@@ -67,3 +67,7 @@ services:
    runner:
       <<: *nodeworker
       command: sh -c 'yarn runner'
+
+   manualimporter:
+      <<: *nodeworker
+      command: sh -c 'yarn manualimport'

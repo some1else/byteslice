@@ -1,5 +1,6 @@
 const MAX_EDGES = 6
-const MAX_ID = 831401
+// const MAX_ID = 831401
+const MAX_ID = 1004239
 
 const SEED_DATA = require("./seedData.json")
 

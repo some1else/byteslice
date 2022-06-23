@@ -2,7 +2,7 @@
 
 const MIN_COUNT = 200
 const MAX_COUNT = 240
-const DEFAULT_SLEEP = 30
+const DEFAULT_SLEEP = 10
 
 const util = require("util")
 const exec = util.promisify(require("child_process").exec)

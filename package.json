@@ -20,6 +20,7 @@
     "start": "react-scripts start",
     "projector": "serve -s build -p 3000",
     "server": "babel-node server/index.js",
+    "manualimport": "babel-node server/manualImporter.js",
     "scraper": "babel-node server/scrapeWorker.js",
     "importer": "babel-node server/importWorker.js",
     "slicer": "babel-node server/sliceWorker.js",

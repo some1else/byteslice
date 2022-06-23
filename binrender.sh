@@ -18,13 +18,20 @@ echo "Rendering $EXTENSION"
 
 STEPS=50
 
-for i in {0..50}
+ZERONAME=$(echo "$OUTPUT_NAME-0.$EXTENSION")
+
+cp $IMAGE_B $ZERONAME
+convert $ZERONAME -quality 100 $ZERONAME.jpg 1>/dev/null
+sleep 0.125
+rm -f $ZERONAME
+
+for i in {1..50}
 do
 	NAME=$(echo "$OUTPUT_NAME-$i.$EXTENSION")
 	echo "* Rendering slice $NAME"
 	./binbyteslice.sh $IMAGE_A $IMAGE_B $i $NAME $EXTENSION 50
-	sleep 0.25
+	sleep 0.125
 	convert $NAME -quality 100 $NAME.jpg 1>/dev/null
-	sleep 0.25
+	sleep 0.125
 	rm -f $NAME
 done
