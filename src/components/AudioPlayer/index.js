@@ -61,34 +61,44 @@ class AudioPlayer extends PureComponent {
 	}
 
 	componentWillReceiveProps(newProps) {
-		const { edge, mix } = newProps
-		const { loopsA, loopsB } = this.state
+														const { edge, mix } = newProps
+														const { loopsA, loopsB } = this.state
 
-		if (edge && edge.source && edge.target) {
-			const srcSnd = edge.source % 11
-			const endSnd = edge.target % 11
+														if (
+															edge &&
+															edge.source &&
+															edge.target
+														) {
+															const srcSnd = edge.source % 11
+															const endSnd = edge.target % 11
 
-			const newMix = mix / STEPS / 2
+															const newMix = mix / STEPS / 2
 
-			soundsA.forEach((sound, i) => {
-				if (i !== srcSnd) {
-					sound.volume(0, loopsA[i])
-				} else {
-					sound.volume(0.5 - newMix, loopsA[i])
-				}
-			})
+															soundsA.forEach((sound, i) => {
+																if (i !== srcSnd) {
+																	sound.volume(0, loopsA[i])
+																} else {
+																	sound.volume(
+																		0.5 - newMix,
+																		loopsA[i],
+																	)
+																}
+															})
 
-			soundsB.forEach((sound, i) => {
-				if (i !== endSnd) {
-					sound.volume(0, loopsB[i])
-				} else {
-					sound.volume(0.5 + newMix, loopsB[i])
-				}
-			})
-		}
+															soundsB.forEach((sound, i) => {
+																if (i !== endSnd) {
+																	sound.volume(0, loopsB[i])
+																} else {
+																	sound.volume(
+																		0.5 + newMix,
+																		loopsB[i],
+																	)
+																}
+															})
+														}
 
-		console.log("lol")
-	}
+														// console.log("lol")
+													}
 
 	render() {
 		return <Fragment>{}</Fragment>

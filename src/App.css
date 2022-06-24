@@ -4,16 +4,16 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: black;
-  /* background-image: url('/tvnoise.gif');
-  background-size: cover; */
+  background-image: url('/tvnoise.gif');
+  background-size: cover;
   color: white;
-  background-image: linear-gradient(45deg, #808080 25%, transparent 25%),
+  /* background-image: linear-gradient(45deg, #808080 25%, transparent 25%),
     linear-gradient(-45deg, #808080 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, #808080 75%),
-    linear-gradient(-45deg, transparent 75%, #808080 75%);
-  background: rgb(27, 27, 27);
-  background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    linear-gradient(-45deg, transparent 75%, #808080 75%); */
+  /* background: rgb(27, 27, 27); */
+  /* background-size: 20px 20px; */
+  /* background-position: 0 0, 0 10px, 10px -10px, -10px 0px; */
   overflow: hidden;
   width: 100vw;
   height: 100vh;
